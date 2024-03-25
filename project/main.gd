@@ -83,7 +83,7 @@ func _on_Button_pressed():
 		for c in all_components:
 			var data = {}
 			c.save( data )
-			entity_data[ data.ecs_name ] = data
+			entity_data[ c.name() ] = data
 		serialize_data[ e.id() ] = entity_data
 	
 	# print entity serialize data

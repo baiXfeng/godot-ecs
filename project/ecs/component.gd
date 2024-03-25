@@ -1,4 +1,4 @@
-extends RefCounted
+extends Reference
 class_name ecs_component
 
 var _name: String
