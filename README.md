@@ -51,8 +51,8 @@ var component_serialize_dict = {}
 for c in component_list:
 	var all_components = c.entity().get_components()
 	var entity_data = {}
-	var data = {}
 	for cc in all_components:
+	  var data = {}
 		cc.save(data)
 		entity_data[ data.ecs_name ] = data
 	var entity_id = c.entity().id()
