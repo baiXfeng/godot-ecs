@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_world
 
 var debug_print: bool
