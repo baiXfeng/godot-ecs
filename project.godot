@@ -1,0 +1,61 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "ecs_component",
+"language": "GDScript",
+"path": "res://ecs/component.gd"
+}, {
+"base": "Reference",
+"class": "ecs_entity",
+"language": "GDScript",
+"path": "res://ecs/entity.gd"
+}, {
+"base": "Reference",
+"class": "ecs_system",
+"language": "GDScript",
+"path": "res://ecs/system.gd"
+}, {
+"base": "Reference",
+"class": "ecs_test",
+"language": "GDScript",
+"path": "res://ecs/test.gd"
+}, {
+"base": "Reference",
+"class": "ecs_world",
+"language": "GDScript",
+"path": "res://ecs/world.gd"
+} ]
+_global_script_class_icons={
+"ecs_component": "",
+"ecs_entity": "",
+"ecs_system": "",
+"ecs_test": "",
+"ecs_world": ""
+}
+
+[application]
+
+config/name="ecs-project"
+run/main_scene="res://main.tscn"
+config/icon="res://icon.png"
+
+[gui]
+
+common/drop_mouse_on_gui_input_disabled=true
+
+[physics]
+
+common/enable_pause_aware_picking=true
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
