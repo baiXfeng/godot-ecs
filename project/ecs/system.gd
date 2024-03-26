@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_system
 
 var _name: String

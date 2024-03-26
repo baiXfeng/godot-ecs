@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_test
 
 var _world: ecs_world = ecs_world.new()
@@ -49,14 +49,14 @@ func test_remove_entity():
 	
 	var list = _world.get_entity_keys()
 	print("entity list:")
-	if list.empty():
+	if list.is_empty():
 		print("entity list is empty.")
 	else:
 		for key in list:
 			print("entity [%d]" % key)
 	list = _world.fetch_components("c2")
 	print("component list:")
-	if list.empty():
+	if list.is_empty():
 		print("component list is empty.")
 	else:
 		for c in list:
