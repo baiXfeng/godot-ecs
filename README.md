@@ -47,16 +47,17 @@ for c in component_list:
 	var all_components = entity.get_components()
 	
 # serialize components
-var component_serialize_dict = {}
+var serialize_dict = {}
 for c in component_list:
-	var all_components = c.entity().get_components()
+	var e: ecs_entity = c.entity()
+	var all_components = e.get_components()
 	var entity_data = {}
 	for cc in all_components:
 		var data = {}
-		cc.save(data)
-		entity_data[ data.ecs_name ] = data
-	var entity_id = c.entity().id()
-	component_serialize_dict[ entity_id ] = entity_data
-printt("this is entity serialize data", component_serialize_dict)
+		cc.save( data )
+		entity_data[ cc.name() ] = data
+	var entity_id = e.id()
+	serialize_dict[ entity_id ] = entity_data
+printt("this is entity serialize data", serialize_dict)
 
 ```
