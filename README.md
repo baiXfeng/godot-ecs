@@ -1,5 +1,5 @@
 # godot-ecs
-Light ecs framework wirtten with gdscript.
+Lightweight ecs framework wirtten with gdscript.
 
 # Features
 
