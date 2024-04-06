@@ -4,7 +4,6 @@ class_name ecs_event
 var _event_dict: Dictionary
 	
 func add_listener(name: String, object: Object) -> bool:
-	remove_listener(name, object)
 	var dict = _event_dict[name]
 	dict[object] = true
 	return true
