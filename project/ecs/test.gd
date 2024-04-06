@@ -14,6 +14,7 @@ func _init():
 	test_remove_system()
 	mixed_test()
 	test_snapshot()
+	test_event()
 	
 func test_entity():
 	_entity = _world.create_entity()
@@ -120,4 +121,17 @@ func test_snapshot():
 	# save system data
 	print("\nsystem snapshot:")
 	print(sys_data)
+	
+	print("")
+	
+class event_tester extends ecs_system:
+	func _list_events() -> Array:
+		return ["test"]
+	func _on_event(name, param):
+		printt("system [%s] on event [%s] with param [%s]" % [self.name(), name, param])
+	
+func test_event():
+	_world.add_system("test_event_system", event_tester.new())
+	_world.notify("test", "hello test event.")
+	_world.remove_system("test_event_system")
 	

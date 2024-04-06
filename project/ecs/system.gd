@@ -19,12 +19,12 @@ func load(dict: Dictionary):
 	
 func on_enter():
 	if _debug_print:
-		print("system<%s> on_enter." % _name)
+		print("system <%s> on_enter." % _name)
 	_on_enter()
 	
 func on_exit():
 	if _debug_print:
-		print("system<%s> on_exit." % _name)
+		print("system <%s> on_exit." % _name)
 	_on_exit()
 	
 func on_process(delta: float):
@@ -34,8 +34,6 @@ func on_physics_process(delta: float):
 	_on_physics_process(delta)
 	
 func on_event(name: String, param):
-	if _debug_print:
-		print("system<%s> on_event(%s, %s)." % [_name, name, param])
 	_on_event(name, param)
 	
 # ==============================================================================
@@ -53,11 +51,15 @@ func _register_event(e: ecs_event):
 	var events = _list_events()
 	for name in events:
 		e.add_listener(name, self)
+	if _debug_print and not events.empty():
+		print("system <%s> register event list %s." % [_name, events])
 	
 func _unregister_event(e: ecs_event):
 	var events = _list_events()
 	for name in events:
 		e.remove_listener(name, self)
+	if _debug_print and not events.empty():
+		print("system <%s> unregister event list %s." % [_name, events])
 	
 func _to_string() -> String:
 	return "system:%s" % _name
@@ -81,14 +83,15 @@ func _on_exit():
 # override
 func _on_process(delta: float):
 	if _debug_print:
-		print("system<%s> on_process(%.3f)." % [_name, delta])
+		print("system <%s> on_process(%.3f)." % [_name, delta])
 	
 # override
 func _on_physics_process(delta: float):
 	if _debug_print:
-		print("system<%s> on_physics_process(%.3f)." % [_name, delta])
+		print("system <%s> on_physics_process(%.3f)." % [_name, delta])
 	
 # override
 func _on_event(name: String, param):
-	pass
+	if _debug_print:
+		print("system <%s> on_event(%s, %s)." % [_name, name, param])
 	

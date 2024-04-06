@@ -49,6 +49,7 @@ class my_system extends ecs_system:
 		
 	# override
 	func _on_event(name, param):
+		# process event what interested
 		match name:
 			"save":
 				_serialize_entity()
@@ -85,15 +86,14 @@ func _ready():
 	# debug print on
 	_world.debug_print = true
 	
+	# add system
+	_world.add_system("my_system", my_system.new())
+	
 	# create entity
 	var e = _world.create_entity()
-	
 	# add component
 	e.add_component("player_unit", ecs_component.new())
 	e.add_component("my_component", my_component.new())
-	
-	# add system
-	_world.add_system("my_system", my_system.new())
 	
 func _process(delta):
 	
