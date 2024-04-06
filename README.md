@@ -4,7 +4,7 @@ Lightweight ecs framework wirtten with gdscript.
 # Features
 
 - Lightweight and high-performance.
-- Independent of Node components, can run standalone in memory.
+- Independent of Node components.
 - Components and systems support serialization and deserialization.
 - Easy to use.
 
