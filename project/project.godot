@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://ecs/entity.gd"
 }, {
 "base": "Reference",
+"class": "ecs_event",
+"language": "GDScript",
+"path": "res://ecs/event.gd"
+}, {
+"base": "Reference",
 "class": "ecs_system",
 "language": "GDScript",
 "path": "res://ecs/system.gd"
@@ -37,6 +42,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "ecs_component": "",
 "ecs_entity": "",
+"ecs_event": "",
 "ecs_system": "",
 "ecs_test": "",
 "ecs_world": ""

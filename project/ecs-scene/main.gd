@@ -42,6 +42,37 @@ class my_system extends ecs_system:
 		# nothing to do
 		pass
 		
+	# override
+	func _list_events() -> Array:
+		# event name list for interested
+		return ["save"]
+		
+	# override
+	func _on_event(name, param):
+		match name:
+			"save":
+				_serialize_entity()
+		
+	func _serialize_entity():
+		# serialize entity
+		var serialize_data = {}
+		
+		# fetch components
+		var player_units = world().fetch_components("player_unit")
+		for unit in player_units:
+			var e: ecs_entity = unit.entity()
+			var all_components = e.get_components()
+			var entity_data = {}
+			# serialize component data to dictionary
+			for c in all_components:
+				var data = {}
+				c.save( data )
+				entity_data[ c.name() ] = data
+			serialize_data[ e.id() ] = entity_data
+		
+		# print entity serialize data
+		printt("serialize data:", serialize_data)
+		
 	
 # create ecs world
 var _world: ecs_world = ecs_world.new()
@@ -70,22 +101,7 @@ func _process(delta):
 	_world.on_process("my_system", delta)
 	
 func _on_Button_pressed():
-	# serialize entity
-	var serialize_data = {}
 	
-	# fetch components
-	var player_units = _world.fetch_components("player_unit")
-	for unit in player_units:
-		var e: ecs_entity = unit.entity()
-		var all_components = e.get_components()
-		var entity_data = {}
-		# serialize component data to dictionary
-		for c in all_components:
-			var data = {}
-			c.save( data )
-			entity_data[ c.name() ] = data
-		serialize_data[ e.id() ] = entity_data
-	
-	# print entity serialize data
-	printt("\nserialize data:", serialize_data)
+	# system on event
+	_world.notify("save")
 	

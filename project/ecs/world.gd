@@ -6,6 +6,7 @@ var debug_print: bool
 var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
+var _event_pool: ecs_event = ecs_event.new()
 
 var _type_component_dict: Dictionary
 var _entity_component_dict: Dictionary
@@ -128,6 +129,7 @@ func add_system(name: String, system) -> bool:
 	system._debug_print = debug_print
 	system._name = name
 	system._set_world(self)
+	system._register_event(_event_pool)
 	system.on_enter()
 	return true
 	
@@ -135,6 +137,7 @@ func remove_system(name: String) -> bool:
 	if not _system_pool.has(name):
 		return false
 	_system_pool[name].on_exit()
+	_system_pool[name]._unregister_event(_event_pool)
 	return _system_pool.erase(name)
 	
 func remove_all_systems() -> bool:
@@ -160,8 +163,14 @@ func on_process(name: String, delta: float):
 func on_physics_process(name: String, delta: float):
 	_system_pool[name].on_physics_process(delta)
 	
+func notify(event_name: String, param = null):
+	_event_pool.fetch_listener(funcref(self, "_on_system_on_event"), event_name, param)
+	
 func _get_type_list(name: String) -> Dictionary:
 	if not _type_component_dict.has(name):
 		_type_component_dict[name] = {}
 	return _type_component_dict[name]
+	
+func _on_system_on_event(system, name, param):
+	system.on_event(name, param)
 	
