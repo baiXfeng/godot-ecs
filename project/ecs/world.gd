@@ -6,13 +6,15 @@ var debug_print: bool
 var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
-var _event_pool: ecs_event = ecs_event.new()
+var _command_pool: Dictionary
+var _event_pool: ecs_event_center = ecs_event_center.new()
 
 var _type_component_dict: Dictionary
 var _entity_component_dict: Dictionary
 
 func clear():
 	remove_all_systems()
+	remove_all_commands()
 	remove_all_entities()
 	
 func create_entity() -> ecs_entity:
@@ -60,7 +62,6 @@ func add_component(entity_id: int, name: String, component) -> bool:
 	entity_dict[name] = component
 	type_list[component] = true
 	component._name = name
-	component._entity_id = entity_id
 	component._entity = get_entity(entity_id)
 	component._set_world(self)
 	if debug_print:
@@ -126,15 +127,13 @@ func add_system(name: String, system) -> bool:
 	system._debug_print = debug_print
 	system._name = name
 	system._set_world(self)
-	system._register_event(_event_pool)
-	system.on_enter()
+	system.on_enter(self)
 	return true
 	
 func remove_system(name: String) -> bool:
 	if not _system_pool.has(name):
 		return false
-	_system_pool[name].on_exit()
-	_system_pool[name]._unregister_event(_event_pool)
+	_system_pool[name].on_exit(self)
 	return _system_pool.erase(name)
 	
 func remove_all_systems() -> bool:
@@ -154,14 +153,61 @@ func get_system_keys() -> Array:
 func has_system(name: String) -> bool:
 	return _system_pool.has(name)
 	
-func on_process(name: String, delta: float):
-	_system_pool[name].on_process(delta)
+class _command_shell extends RefCounted:
+	var _debug_print: bool
+	var _class: Resource
+	func _init(r: Resource, debug_print: bool = false):
+		_class = r
+		_debug_print = debug_print
+	func _register(w: ecs_world, name: String):
+		w.add_listener(name, self, "_on_event")
+	func _unregister(w: ecs_world, name: String):
+		w.remove_listener(name, self)
+	func _on_event(e: ecs_event):
+		if _debug_print:
+			print("command <%s> execute." % e.name)
+		_class.new().execute(e)
 	
-func on_physics_process(name: String, delta: float):
-	_system_pool[name].on_physics_process(delta)
+func add_command(name: String, cmdres: Resource) -> bool:
+	if cmdres == null:
+		print("add command <%s> fail: Resource is null." % name)
+		return false
+	remove_command(name)
+	var shell = _command_shell.new(cmdres, debug_print)
+	_command_pool[name] = shell
+	shell._register(self, name)
+	if debug_print:
+		print("command <%s> add to ecs_world." % name)
+	return true
 	
-func notify(event_name: String, param = null):
-	_event_pool.fetch_listener(Callable(self, "_on_system_on_event"), event_name, param)
+func remove_command(name: String) -> bool:
+	if _command_pool.has(name):
+		var shell = _command_pool[name]
+		shell._unregister(self, name)
+		if debug_print:
+			print("command <%s> remove from ecs_world." % name)
+	return _command_pool.erase(name)
+	
+func remove_all_commands() -> bool:
+	var keys = _command_pool.keys()
+	for name in keys:
+		remove_command(name)
+	return true
+	
+func has_command(name: String):
+	return _command_pool.has(name)
+	
+func add_listener(name: String, listener: Object, function: String):
+	_event_pool.add(name, listener, function)
+	
+func remove_listener(name: String, listener: Object):
+	_event_pool.remove(name, listener)
+	
+func notify(event_name: String, value = null):
+	_event_pool.notify(event_name, value, self)
+	
+func send(e: ecs_event):
+	_event_pool.send(e)
 	
 func _get_type_list(name: String) -> Dictionary:
 	if not _type_component_dict.has(name):

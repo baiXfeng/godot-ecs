@@ -1,27 +1,39 @@
 extends RefCounted
 class_name ecs_event
+
+var name: String: get = _get_name, set = _set_name
+var data : get = _get_data, set = _set_data
+var context : get = _get_context, set = _set_context
+
+# ==============================================================================
+# private
+var _name: String
+var _data
+var _context: WeakRef
 	
-var _event_dict: Dictionary
+func _init(n, d, c = null):
+	_name = n
+	_data = d
+	_context = weakref(c)
 	
-func add_listener(name: String, object: Object) -> bool:
-	var dict = _get_event_dict(name)
-	dict[object] = true
-	return true
+func _set_name(v):
+	pass
 	
-func remove_listener(name: String, object: Object) -> bool:
-	var dict = _get_event_dict(name)
-	return dict.erase(object)
+func _get_name() -> String:
+	return _name
 	
-func fetch_listener(fetcher: Callable, name: String, param):
-	var dict = _get_event_dict(name)
-	for listener in dict:
-		fetcher.call(listener, name, param)
+func _set_data(v):
+	pass
 	
-func clear():
-	_event_dict.clear()
+func _get_data():
+	return _data
 	
-func _get_event_dict(name: String) -> Dictionary:
-	if not _event_dict.has(name):
-		_event_dict[name] = {}
-	return _event_dict[name]
+func _set_context(c):
+	pass
+	
+func _get_context():
+	return _context.get_ref()
+	
+func _to_string():
+	return "ecs_event(\"%s\", %s)" % [name, _data]
 	

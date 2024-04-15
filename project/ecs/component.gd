@@ -3,7 +3,6 @@ class_name ecs_component
 
 var _name: String
 var _entity: ecs_entity
-var _entity_id: int
 var _world: WeakRef
 
 func name() -> String:
@@ -11,9 +10,6 @@ func name() -> String:
 	
 func entity() -> ecs_entity:
 	return _entity
-	
-func entity_id() -> int:
-	return _entity_id
 	
 func world() -> ecs_world:
 	return _world.get_ref()
