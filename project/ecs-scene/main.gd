@@ -83,17 +83,17 @@ func _ready():
 	# debug print on
 	_world.debug_print = true
 	
-	# add system
-	_world.add_system("my_system", my_system.new())
-	
-	# add command, use class resource, not instance
-	_world.add_command("save_game_command", my_command)
-	
 	# create entity
 	var e = _world.create_entity()
 	# add component
 	e.add_component("player_unit", ecs_component.new())
 	e.add_component("my_component", my_component.new())
+	
+	# add system
+	_world.add_system("my_system", my_system.new())
+	
+	# add command, use class resource, not instance
+	_world.add_command("save_game_command", my_command)
 	
 func _process(delta):
 	
