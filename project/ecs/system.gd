@@ -17,52 +17,26 @@ func save(dict: Dictionary):
 func load(dict: Dictionary):
 	_on_load(dict)
 	
-func on_enter():
+func on_enter(w: ecs_world):
 	if _debug_print:
 		print("system <%s> on_enter." % _name)
-	_on_enter()
+	_on_enter(w)
 	
-func on_exit():
+func on_exit(w: ecs_world):
 	if _debug_print:
 		print("system <%s> on_exit." % _name)
-	_on_exit()
-	
-func on_process(delta: float):
-	_on_process(delta)
-	
-func on_physics_process(delta: float):
-	_on_physics_process(delta)
-	
-func on_event(name: String, param):
-	_on_event(name, param)
+	_on_exit(w)
 	
 # ==============================================================================
-# private function
-	
-func _set_world(world: ecs_world):
-	_world = weakref(world)
+# override function
 	
 # override
-func _list_events() -> Array:
-	# return event name list for interested
-	return []
+func _on_enter(w: ecs_world):
+	pass
 	
-func _register_event(e: ecs_event):
-	var events = _list_events()
-	for name in events:
-		e.add_listener(name, self)
-	if _debug_print and not events.empty():
-		print("system <%s> register event list %s." % [_name, events])
-	
-func _unregister_event(e: ecs_event):
-	var events = _list_events()
-	for name in events:
-		e.remove_listener(name, self)
-	if _debug_print and not events.empty():
-		print("system <%s> unregister event list %s." % [_name, events])
-	
-func _to_string() -> String:
-	return "system:%s" % _name
+# override
+func _on_exit(w: ecs_world):
+	pass
 	
 # override
 func _on_save(dict: Dictionary):
@@ -72,26 +46,13 @@ func _on_save(dict: Dictionary):
 func _on_load(dict: Dictionary):
 	pass
 	
-# override
-func _on_enter():
-	pass
+# ==============================================================================
+# private function
 	
-# override
-func _on_exit():
-	pass
+func _set_world(w: ecs_world):
+	_world = weakref(w)
 	
-# override
-func _on_process(delta: float):
-	if _debug_print:
-		print("system <%s> on_process(%.3f)." % [_name, delta])
+func _to_string() -> String:
+	return "system:%s" % _name
 	
-# override
-func _on_physics_process(delta: float):
-	if _debug_print:
-		print("system <%s> on_physics_process(%.3f)." % [_name, delta])
-	
-# override
-func _on_event(name: String, param):
-	if _debug_print:
-		print("system <%s> on_event(%s, %s)." % [_name, name, param])
 	

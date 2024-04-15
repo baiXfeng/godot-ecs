@@ -85,7 +85,7 @@ func mixed_test():
 	var list = _world.fetch_components("c1")
 	print("mixed test component list:")
 	for c in list:
-		print("component [%s] entity [%d]" % [c.name(), c.entity_id()])
+		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
 	printt("mixed test system list:", _world.get_system_keys())
 	
 func test_snapshot():

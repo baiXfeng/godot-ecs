@@ -22,44 +22,42 @@ class my_system extends ecs_system:
 	var components: Array
 	
 	# override
-	func _on_enter():
+	func _on_enter(w: ecs_world):
+		w.add_listener("on_process", self, "_on_process")
 		components = world().fetch_components("my_component")
 		
 	# override
-	func _on_exit():
-		# nothing to do
-		pass
+	func _on_exit(w: ecs_world):
+		w.remove_listener("on_process", self)
 		
-	# override
-	func _on_process(delta: float):
-		# do something
+	func _on_process(e: ecs_event):
+		# event param
+		var delta: float = e.data
+		# do some thing
 		for c in components:
 			c.value1 += 1
 			c.value2 += delta
-		
+	
+# my command extends ecs_command
+class my_command extends ecs_command:
+	
+	func _init():
+		print("my_command created.")
+	
 	# override
-	func _on_physics_process(delta: float):
-		# nothing to do
-		pass
+	func _on_execute(e: ecs_event):
+		print("my_command execute.")
+		_on_save_game(e)
+	
+	func _on_save_game(event: ecs_event):
+		# wrold
+		var world: ecs_world = event.context
 		
-	# override
-	func _list_events() -> Array:
-		# event name list for interested
-		return ["save"]
-		
-	# override
-	func _on_event(name, param):
-		# process event what interested
-		match name:
-			"save":
-				_serialize_entity()
-		
-	func _serialize_entity():
 		# serialize entity
 		var serialize_data = {}
 		
 		# fetch components
-		var player_units = world().fetch_components("player_unit")
+		var player_units = world.fetch_components("player_unit")
 		for unit in player_units:
 			var e: ecs_entity = unit.entity()
 			var all_components = e.get_components()
@@ -73,7 +71,6 @@ class my_system extends ecs_system:
 		
 		# print entity serialize data
 		printt("serialize data:", serialize_data)
-		
 	
 # create ecs world
 var _world: ecs_world = ecs_world.new()
@@ -81,13 +78,16 @@ var _world: ecs_world = ecs_world.new()
 func _ready():
 	
 	# run ecs test
-	# ecs_test.new()
+	ecs_test.new()
 	
 	# debug print on
 	_world.debug_print = true
 	
 	# add system
 	_world.add_system("my_system", my_system.new())
+	
+	# add command, use class resource, not instance
+	_world.add_command("save_game_command", my_command)
 	
 	# create entity
 	var e = _world.create_entity()
@@ -98,10 +98,10 @@ func _ready():
 func _process(delta):
 	
 	# system on process
-	_world.on_process("my_system", delta)
+	_world.notify("on_process", delta)
 	
 func _on_Button_pressed():
 	
 	# system on event
-	_world.notify("save")
+	_world.notify("save_game_command")
 	

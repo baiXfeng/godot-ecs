@@ -10,6 +10,11 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Reference",
+"class": "ecs_command",
+"language": "GDScript",
+"path": "res://ecs/command.gd"
+}, {
+"base": "Reference",
 "class": "ecs_component",
 "language": "GDScript",
 "path": "res://ecs/component.gd"
@@ -23,6 +28,11 @@ _global_script_classes=[ {
 "class": "ecs_event",
 "language": "GDScript",
 "path": "res://ecs/event.gd"
+}, {
+"base": "Reference",
+"class": "ecs_event_center",
+"language": "GDScript",
+"path": "res://ecs/event_center.gd"
 }, {
 "base": "Reference",
 "class": "ecs_system",
@@ -40,9 +50,11 @@ _global_script_classes=[ {
 "path": "res://ecs/world.gd"
 } ]
 _global_script_class_icons={
+"ecs_command": "",
 "ecs_component": "",
 "ecs_entity": "",
 "ecs_event": "",
+"ecs_event_center": "",
 "ecs_system": "",
 "ecs_test": "",
 "ecs_world": ""
