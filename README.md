@@ -31,9 +31,12 @@ world.add_system("s1", ecs_system.new())
 world.add_system("s2", ecs_system.new())
 world.add_system("s2", ecs_system.new())
 
-# run system
-world.on_physics_process("s1", delta)
-world.on_process("s1", delta)
+# add command
+world.add_command("my_command", ecs_command)
+
+# send notification
+world.notify("my_notification", with_param)
+world.notify("my_command", with_param)
 
 # fetch components
 var component_list = world.fetch_components("c1")
