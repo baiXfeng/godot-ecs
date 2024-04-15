@@ -1,9 +1,9 @@
-extends Reference
+extends RefCounted
 class_name ecs_event
 
-var name: String setget _set_name, _get_name
-var data setget _set_data, _get_data
-var context setget _set_context, _get_context
+var name: String: get = _get_name, set = _set_name
+var data : get = _get_data, set = _set_data
+var context : get = _get_context, set = _set_context
 
 # ==============================================================================
 # private

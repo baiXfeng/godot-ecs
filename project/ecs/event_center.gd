@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_event_center
 	
 var _event_dict: Dictionary

@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_world
 
 var debug_print: bool
@@ -153,7 +153,7 @@ func get_system_keys() -> Array:
 func has_system(name: String) -> bool:
 	return _system_pool.has(name)
 	
-class _command_shell extends Reference:
+class _command_shell extends RefCounted:
 	var _debug_print: bool
 	var _class: Resource
 	func _init(r: Resource, debug_print: bool = false):
