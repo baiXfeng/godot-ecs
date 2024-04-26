@@ -1,7 +1,7 @@
 extends Reference
 class_name ecs_test
 
-var _world: ecs_world = ecs_world.new()
+var _world: ecs_world = ecs_world.new("ecs_world_test")
 var _entity: ecs_entity
 
 func _init():
@@ -125,13 +125,17 @@ func test_snapshot():
 	print("")
 	
 class event_tester extends ecs_system:
-	func _list_events() -> Array:
-		return ["test"]
-	func _on_event(name, param):
-		printt("system [%s] on event [%s] with param [%s]" % [self.name(), name, param])
+	func _on_enter(w: ecs_world):
+		w.add_listener("test", self, "_on_event")
+		pass
+	func _on_exit(w: ecs_world):
+		w.remove_listener("test", self)
+	func _on_event(e: ecs_event):
+		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
 func test_event():
 	_world.add_system("test_event_system", event_tester.new())
 	_world.notify("test", "hello test event.")
 	_world.remove_system("test_event_system")
+	_world.notify("test", "hello test event.")
 	

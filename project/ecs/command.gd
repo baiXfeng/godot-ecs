@@ -13,8 +13,6 @@ func execute(e: ecs_event):
 	_on_execute(e)
 	
 # ==============================================================================
-# override function
-	
 # override
 func _on_execute(e: ecs_event):
 	pass
