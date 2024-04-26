@@ -3,6 +3,8 @@ class_name ecs_world
 
 var debug_print: bool
 
+var _name: String
+
 var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
@@ -11,7 +13,13 @@ var _event_pool: ecs_event_center = ecs_event_center.new()
 
 var _type_component_dict: Dictionary
 var _entity_component_dict: Dictionary
-
+	
+func _init(name: String = "ecs_world"):
+	_name = name
+	
+func name() -> String:
+	return _name
+	
 func clear():
 	remove_all_systems()
 	remove_all_commands()
@@ -23,14 +31,14 @@ func create_entity() -> ecs_entity:
 	_entity_pool[_entity_id] = e
 	_entity_component_dict[_entity_id] = {}
 	if debug_print:
-		print("entity <%d> created." % _entity_id)
+		print("entity <%s:%d> created." % [_name, _entity_id])
 	return e
 	
 func remove_entity(entity_id: int) -> bool:
 	if not remove_all_components(entity_id):
 		return false
 	if debug_print:
-		print("entity <%d> destroyed." % _entity_id)
+		print("entity <%s:%d> destroyed." % [_name, _entity_id])
 	_entity_component_dict.erase(entity_id)
 	return _entity_pool.erase(entity_id)
 	
@@ -65,7 +73,7 @@ func add_component(entity_id: int, name: String, component) -> bool:
 	component._entity = get_entity(entity_id)
 	component._set_world(self)
 	if debug_print:
-		print("component <%s> add to entity <%d>." % [name, entity_id])
+		print("component <%s:%s> add to entity <%d>." % [_name, name, entity_id])
 	notify("on_component_added", component)
 	return true
 	
@@ -77,7 +85,7 @@ func remove_component(entity_id: int, name: String) -> bool:
 	var c = entity_dict[name]
 	type_list.erase(c)
 	if debug_print:
-		print("component <%s> remove from entity <%d>." % [name, entity_id])
+		print("component <%s:%s> remove from entity <%d>." % [_name, name, entity_id])
 	notify("on_component_removed", c)
 	return entity_dict.erase(name)
 	
@@ -124,7 +132,6 @@ func fetch_components(name: String) -> Array:
 func add_system(name: String, system) -> bool:
 	remove_system(name)
 	_system_pool[name] = system
-	system._debug_print = debug_print
 	system._name = name
 	system._set_world(self)
 	system.on_enter(self)
@@ -156,28 +163,30 @@ func has_system(name: String) -> bool:
 class _command_shell extends RefCounted:
 	var _debug_print: bool
 	var _class: Resource
+	var _w_name: String
 	func _init(r: Resource, debug_print: bool = false):
 		_class = r
 		_debug_print = debug_print
 	func _register(w: ecs_world, name: String):
+		_w_name = w.name()
 		w.add_listener(name, self, "_on_event")
 	func _unregister(w: ecs_world, name: String):
 		w.remove_listener(name, self)
 	func _on_event(e: ecs_event):
 		if _debug_print:
-			print("command <%s> execute." % e.name)
+			print("command <%s:%s> execute." % [_w_name, e.name])
 		_class.new().execute(e)
 	
 func add_command(name: String, cmdres: Resource) -> bool:
 	if cmdres == null:
-		print("add command <%s> fail: Resource is null." % name)
+		print("add command <%s:%s> fail: Resource is null." % [_name, name])
 		return false
 	remove_command(name)
 	var shell = _command_shell.new(cmdres, debug_print)
 	_command_pool[name] = shell
 	shell._register(self, name)
 	if debug_print:
-		print("command <%s> add to ecs_world." % name)
+		print("command <%s:%s> add to ecs_world." % [_name, name])
 	return true
 	
 func remove_command(name: String) -> bool:
@@ -185,7 +194,7 @@ func remove_command(name: String) -> bool:
 		var shell = _command_pool[name]
 		shell._unregister(self, name)
 		if debug_print:
-			print("command <%s> remove from ecs_world." % name)
+			print("command <%s:%s> remove from ecs_world." % [_name, name])
 	return _command_pool.erase(name)
 	
 func remove_all_commands() -> bool:
@@ -213,7 +222,4 @@ func _get_type_list(name: String) -> Dictionary:
 	if not _type_component_dict.has(name):
 		_type_component_dict[name] = {}
 	return _type_component_dict[name]
-	
-func _on_system_on_event(system, name, param):
-	system.on_event(name, param)
 	

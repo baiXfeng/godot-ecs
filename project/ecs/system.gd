@@ -3,7 +3,6 @@ class_name ecs_system
 
 var _name: String
 var _world: WeakRef
-var _debug_print: bool
 
 func name() -> String:
 	return _name
@@ -18,14 +17,20 @@ func load(dict: Dictionary):
 	_on_load(dict)
 	
 func on_enter(w: ecs_world):
-	if _debug_print:
-		print("system <%s> on_enter." % _name)
+	if w.debug_print:
+		print("system <%s:%s> on_enter." % [world().name(), _name])
 	_on_enter(w)
 	
 func on_exit(w: ecs_world):
-	if _debug_print:
-		print("system <%s> on_exit." % _name)
+	if w.debug_print:
+		print("system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
+	
+func notity(event_name: String, value = null):
+	world().notity(event_name, value)
+	
+func send(e: ecs_event):
+	world().send(e)
 	
 # ==============================================================================
 # override function
