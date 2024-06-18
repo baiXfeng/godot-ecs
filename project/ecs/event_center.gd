@@ -12,8 +12,8 @@ func remove(name: String, listener: Object) -> bool:
 	var dict = _get_event_dict(name)
 	return dict.erase(listener)
 	
-func notify(name: String, value, context = null):
-	send( ecs_event.new(name, value, context) )
+func notify(name: String, value):
+	send( ecs_event.new(name, value) )
 	
 func send(e: ecs_event):
 	var dict = _get_event_dict(e.name)

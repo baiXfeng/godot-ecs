@@ -19,6 +19,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://ecs/component.gd"
 }, {
+"base": "ecs_component",
+"class": "ecs_data_component",
+"language": "GDScript",
+"path": "res://ecs/data_component.gd"
+}, {
 "base": "Reference",
 "class": "ecs_entity",
 "language": "GDScript",
@@ -44,20 +49,33 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://ecs/test.gd"
 }, {
+"base": "ecs_component",
+"class": "ecs_view_component",
+"language": "GDScript",
+"path": "res://ecs/view_component.gd"
+}, {
 "base": "Reference",
 "class": "ecs_world",
 "language": "GDScript",
 "path": "res://ecs/world.gd"
+}, {
+"base": "Node",
+"class": "rpc_system",
+"language": "GDScript",
+"path": "res://ecs/rpc_system.gd"
 } ]
 _global_script_class_icons={
 "ecs_command": "",
 "ecs_component": "",
+"ecs_data_component": "",
 "ecs_entity": "",
 "ecs_event": "",
 "ecs_event_center": "",
 "ecs_system": "",
 "ecs_test": "",
-"ecs_world": ""
+"ecs_view_component": "",
+"ecs_world": "",
+"rpc_system": ""
 }
 
 [application]

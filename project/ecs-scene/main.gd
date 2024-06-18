@@ -51,7 +51,7 @@ class my_command extends ecs_command:
 	
 	func _on_save_game(event: ecs_event):
 		# wrold
-		var world: ecs_world = event.context
+		var world: ecs_world = self.world()
 		
 		# serialize entity
 		var serialize_data = {}
