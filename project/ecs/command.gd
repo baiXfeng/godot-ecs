@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_command
 
 var _cmd_list: Array
@@ -8,7 +8,7 @@ func add_command(cmd):
 	_cmd_list.append(cmd)
 	
 func execute(e: ecs_event):
-	if not _cmd_list.empty():
+	if not _cmd_list.is_empty():
 		for cmd in _cmd_list:
 			cmd._set_world(world())
 			cmd.execute(e)

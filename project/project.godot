@@ -6,82 +6,13 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
-
-_global_script_classes=[ {
-"base": "Reference",
-"class": "ecs_command",
-"language": "GDScript",
-"path": "res://ecs/command.gd"
-}, {
-"base": "Reference",
-"class": "ecs_component",
-"language": "GDScript",
-"path": "res://ecs/component.gd"
-}, {
-"base": "ecs_component",
-"class": "ecs_data_component",
-"language": "GDScript",
-"path": "res://ecs/data_component.gd"
-}, {
-"base": "Reference",
-"class": "ecs_entity",
-"language": "GDScript",
-"path": "res://ecs/entity.gd"
-}, {
-"base": "Reference",
-"class": "ecs_event",
-"language": "GDScript",
-"path": "res://ecs/event.gd"
-}, {
-"base": "Reference",
-"class": "ecs_event_center",
-"language": "GDScript",
-"path": "res://ecs/event_center.gd"
-}, {
-"base": "Reference",
-"class": "ecs_system",
-"language": "GDScript",
-"path": "res://ecs/system.gd"
-}, {
-"base": "Reference",
-"class": "ecs_test",
-"language": "GDScript",
-"path": "res://ecs/test.gd"
-}, {
-"base": "ecs_component",
-"class": "ecs_view_component",
-"language": "GDScript",
-"path": "res://ecs/view_component.gd"
-}, {
-"base": "Reference",
-"class": "ecs_world",
-"language": "GDScript",
-"path": "res://ecs/world.gd"
-}, {
-"base": "Node",
-"class": "rpc_system",
-"language": "GDScript",
-"path": "res://ecs/rpc_system.gd"
-} ]
-_global_script_class_icons={
-"ecs_command": "",
-"ecs_component": "",
-"ecs_data_component": "",
-"ecs_entity": "",
-"ecs_event": "",
-"ecs_event_center": "",
-"ecs_system": "",
-"ecs_test": "",
-"ecs_view_component": "",
-"ecs_world": "",
-"rpc_system": ""
-}
+config_version=5
 
 [application]
 
 config/name="ecs-project"
 run/main_scene="res://ecs-scene/main.tscn"
+config/features=PackedStringArray("4.2")
 config/icon="res://icon.png"
 
 [gui]
@@ -94,4 +25,4 @@ common/enable_pause_aware_picking=true
 
 [rendering]
 
-environment/default_environment="res://default_env.tres"
+environment/defaults/default_environment="res://default_env.tres"

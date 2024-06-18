@@ -78,7 +78,7 @@ var _world: ecs_world = ecs_world.new()
 func _ready():
 	
 	# run ecs test
-	# ecs_test.new()
+	ecs_test.new()
 	
 	# debug print on
 	_world.debug_print = true

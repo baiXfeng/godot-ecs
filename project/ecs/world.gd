@@ -1,4 +1,4 @@
-extends Reference
+extends RefCounted
 class_name ecs_world
 
 var debug_print: bool
@@ -233,7 +233,7 @@ func get_rpc_system_keys() -> Array:
 func has_rpc_system(name: String) -> bool:
 	return _rpc_system_pool.has(name)
 	
-class _command_shell extends Reference:
+class _command_shell extends RefCounted:
 	var _debug_print: bool
 	var _class: Resource
 	var _w_name: String
