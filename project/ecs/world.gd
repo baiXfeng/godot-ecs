@@ -123,13 +123,49 @@ func fetch_components(name: String) -> Array:
 		return []
 	return _type_component_dict[name].keys()
 	
-func set_entity_group(entity_id: int, group: String):
-	pass
+var _group_entity_dict: Dictionary
+var _entity_groups: Dictionary
 	
-func get_entity_group(entity_id: int) -> String:
-	return ""
+func entity_add_to_group(entity_id: int, group_name: String) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var dict = _get_group_entity_dict(group_name)
+	dict[ get_entity(entity_id) ] = true
+	dict = _get_entity_groups(entity_id)
+	dict[ group_name ] = true
+	if debug_print:
+		print("entity <%s:%d> add to group <%s>." % [_name, entity_id, group_name])
+	return true
 	
-func fetch_entities(group: String) -> Array:
+func entity_remove_from_group(entity_id: int, group_name: String) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var dict = _get_group_entity_dict(group_name)
+	dict.erase( get_entity(entity_id) )
+	dict = _get_entity_groups(entity_id)
+	dict.erase( group_name )
+	if debug_print:
+		print("entity <%s:%d> remove from group <%s>." % [_name, entity_id, group_name])
+	return true
+	
+func entity_get_groups(entity_id: int) -> Array:
+	if not has_entity(entity_id):
+		return []
+	return _get_entity_groups(entity_id).keys()
+	
+func _get_group_entity_dict(group_name: String) -> Dictionary:
+	if not _group_entity_dict.has(group_name):
+		_group_entity_dict[group_name] = {}
+	return _group_entity_dict[group_name]
+	
+func _get_entity_groups(entity_id: int) -> Dictionary:
+	if not _entity_groups.has(entity_id):
+		_entity_groups[entity_id] = {}
+	return _entity_groups[entity_id]
+	
+func fetch_entities(group_name: String) -> Array:
+	if _group_entity_dict.has(group_name):
+		return _group_entity_dict[group_name].keys()
 	return []
 	
 func add_system(name: String, system) -> bool:

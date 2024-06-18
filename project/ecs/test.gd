@@ -16,7 +16,8 @@ func _init():
 	mixed_test()
 	test_snapshot()
 	test_event()
-	_test_command()
+	test_command()
+	test_entity_add_to_group()
 	
 func test_entity():
 	_entity = _world.create_entity()
@@ -163,7 +164,7 @@ class _cmd extends ecs_command:
 	func _on_execute(e: ecs_event):
 		print("test command execute.")
 	
-func _test_command():
+func test_command():
 	_world.add_command("test_cmd_1", _cmd)
 	_world.add_command("test_cmd_2", _cmd)
 	
@@ -176,5 +177,15 @@ func _test_command():
 	
 	printt("has command", _world.has_command("test_cmd_1"))
 	print("")
+	
+func test_entity_add_to_group():
+	var e = _world.create_entity()
+	e.add_to_group("battle")
+	e.add_to_group("attack")
+	printt("entity group list:", e.get_groups())
+	e.remove_from_group("battle")
+	printt("entity group list:", e.get_groups())
+	var list = _world.fetch_entities("battle")
+	printt("battle entity size:", list.size())
 	
 	
