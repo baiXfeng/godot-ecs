@@ -8,6 +8,7 @@ var _name: String
 var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
+var _rpc_system_pool: Dictionary
 var _command_pool: Dictionary
 var _event_pool: ecs_event_center = ecs_event_center.new()
 
@@ -54,10 +55,7 @@ func get_entity(id: int) -> ecs_entity:
 	return null
 	
 func get_entity_keys() -> Array:
-	var ret = []
-	for key in _entity_pool:
-		ret.append(key)
-	return []
+	return _entity_pool.keys()
 	
 func has_entity(id: int) -> bool:
 	return _entity_pool.has(id)
@@ -123,16 +121,57 @@ func has_component(entity_id: int, name: String) -> bool:
 func fetch_components(name: String) -> Array:
 	if not _type_component_dict.has(name):
 		return []
-	var ret = []
-	var list = _type_component_dict[name]
-	for c in list:
-		ret.append(c)
-	return ret
+	return _type_component_dict[name].keys()
+	
+var _group_entity_dict: Dictionary
+var _entity_groups: Dictionary
+	
+func entity_add_to_group(entity_id: int, group_name: String) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var dict = _get_group_entity_dict(group_name)
+	dict[ get_entity(entity_id) ] = true
+	dict = _get_entity_groups(entity_id)
+	dict[ group_name ] = true
+	if debug_print:
+		print("entity <%s:%d> add to group <%s>." % [_name, entity_id, group_name])
+	return true
+	
+func entity_remove_from_group(entity_id: int, group_name: String) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var dict = _get_group_entity_dict(group_name)
+	dict.erase( get_entity(entity_id) )
+	dict = _get_entity_groups(entity_id)
+	dict.erase( group_name )
+	if debug_print:
+		print("entity <%s:%d> remove from group <%s>." % [_name, entity_id, group_name])
+	return true
+	
+func entity_get_groups(entity_id: int) -> Array:
+	if not has_entity(entity_id):
+		return []
+	return _get_entity_groups(entity_id).keys()
+	
+func _get_group_entity_dict(group_name: String) -> Dictionary:
+	if not _group_entity_dict.has(group_name):
+		_group_entity_dict[group_name] = {}
+	return _group_entity_dict[group_name]
+	
+func _get_entity_groups(entity_id: int) -> Dictionary:
+	if not _entity_groups.has(entity_id):
+		_entity_groups[entity_id] = {}
+	return _entity_groups[entity_id]
+	
+func fetch_entities(group_name: String) -> Array:
+	if _group_entity_dict.has(group_name):
+		return _group_entity_dict[group_name].keys()
+	return []
 	
 func add_system(name: String, system) -> bool:
 	remove_system(name)
 	_system_pool[name] = system
-	system._name = name
+	system._set_name(name)
 	system._set_world(self)
 	system.on_enter(self)
 	return true
@@ -160,22 +199,61 @@ func get_system_keys() -> Array:
 func has_system(name: String) -> bool:
 	return _system_pool.has(name)
 	
+func add_rpc_system(name: String, system) -> bool:
+	remove_rpc_system(name)
+	_rpc_system_pool[name] = system
+	system._set_name(name)
+	system._set_world(self)
+	system.on_enter(self)
+	return true
+	
+func remove_rpc_system(name: String, queue_free: bool = true) -> bool:
+	if not _rpc_system_pool.has(name):
+		return false
+	var system = _rpc_system_pool[name]
+	system.on_exit(self)
+	if queue_free:
+		system.queue_free()
+	return _rpc_system_pool.erase(name)
+	
+func remove_all_rpc_systems() -> bool:
+	var keys = _rpc_system_pool.keys()
+	for name in keys:
+		remove_rpc_system(name)
+	return true
+	
+func get_rpc_system(name: String):
+	if not _rpc_system_pool.has(name):
+		return null
+	return _rpc_system_pool[name]
+	
+func get_rpc_system_keys() -> Array:
+	return _rpc_system_pool.keys()
+	
+func has_rpc_system(name: String) -> bool:
+	return _rpc_system_pool.has(name)
+	
 class _command_shell extends RefCounted:
 	var _debug_print: bool
 	var _class: Resource
 	var _w_name: String
+	var _world: WeakRef
 	func _init(r: Resource, debug_print: bool = false):
 		_class = r
 		_debug_print = debug_print
 	func _register(w: ecs_world, name: String):
 		_w_name = w.name()
+		_world = weakref(w)
 		w.add_listener(name, self, "_on_event")
 	func _unregister(w: ecs_world, name: String):
 		w.remove_listener(name, self)
+		_world = null
 	func _on_event(e: ecs_event):
 		if _debug_print:
 			print("command <%s:%s> execute." % [_w_name, e.name])
-		_class.new().execute(e)
+		var cmd = _class.new()
+		cmd._set_world(_world.get_ref())
+		cmd.execute(e)
 	
 func add_command(name: String, cmdres: Resource) -> bool:
 	if cmdres == null:
@@ -213,7 +291,7 @@ func remove_listener(name: String, listener: Object):
 	_event_pool.remove(name, listener)
 	
 func notify(event_name: String, value = null):
-	_event_pool.notify(event_name, value, self)
+	_event_pool.notify(event_name, value)
 	
 func send(e: ecs_event):
 	_event_pool.send(e)
