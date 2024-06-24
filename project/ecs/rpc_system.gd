@@ -39,8 +39,8 @@ func on_exit(w: ecs_world):
 		print("rpc system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
 	
-func notity(event_name: String, value = null):
-	world().notity(event_name, value)
+func notify(event_name: String, value = null):
+	world().notify(event_name, value)
 	
 func send(e: ecs_event):
 	world().send(e)
