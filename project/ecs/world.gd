@@ -72,20 +72,27 @@ func add_component(entity_id: int, name: String, component) -> bool:
 	component._set_world(self)
 	if debug_print:
 		print("component <%s:%s> add to entity <%d>." % [_name, name, entity_id])
-	notify("on_component_added", component)
+	# 实体组件添加信号
+	var entity: ecs_entity = component._entity
+	entity.on_component_added.emit(entity, component)
 	return true
 	
 func remove_component(entity_id: int, name: String) -> bool:
 	if not has_entity(entity_id):
 		return false
 	var entity_dict = _entity_component_dict[entity_id]
+	if not entity_dict.has(name):
+		return false
 	var type_list = _type_component_dict[name]
 	var c = entity_dict[name]
 	type_list.erase(c)
 	if debug_print:
 		print("component <%s:%s> remove from entity <%d>." % [_name, name, entity_id])
-	notify("on_component_removed", c)
-	return entity_dict.erase(name)
+	var sucessed = entity_dict.erase(name)
+	# 实体组件移除信号
+	var entity: ecs_entity = c._entity
+	entity.on_component_removed.emit(entity, c)
+	return sucessed
 	
 func remove_all_components(entity_id: int) -> bool:
 	if not has_entity(entity_id):

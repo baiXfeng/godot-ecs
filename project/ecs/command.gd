@@ -8,10 +8,9 @@ func add_command(cmd):
 	_cmd_list.append(cmd)
 	
 func execute(e: ecs_event):
-	if not _cmd_list.is_empty():
-		for cmd in _cmd_list:
-			cmd._set_world(world())
-			cmd.execute(e)
+	for cmd in _cmd_list:
+		cmd._set_world(world())
+		cmd.execute(e)
 	_on_execute(e)
 	
 func world() -> ecs_world:

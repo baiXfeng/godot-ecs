@@ -4,6 +4,9 @@ class_name ecs_entity
 var _id: int
 var _world: WeakRef
 
+signal on_component_added(entity, component)
+signal on_component_removed(entity, component)
+
 func _init(id: int, world):
 	_id = id
 	_world = weakref(world)
@@ -19,6 +22,12 @@ func world():
 	
 func valid() -> bool:
 	return world().has_entity(_id)
+	
+func notify(event_name: String, value = null):
+	world().notify(event_name, value)
+	
+func send(e: ecs_event):
+	world().send(e)
 	
 func add_component(name: String, component) -> bool:
 	return world().add_component(_id, name, component)
