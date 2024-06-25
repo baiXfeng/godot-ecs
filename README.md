@@ -1,6 +1,8 @@
 # godot-ecs
 Lightweight ecs framework wirtten with gdscript.
 
+![](ecs.png)
+
 # Features
 
 - Lightweight and high-performance.
