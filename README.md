@@ -31,7 +31,7 @@ e.add_component("c3", ecs_component.new())
 # add system
 world.add_system("s1", ecs_system.new())
 world.add_system("s2", ecs_system.new())
-world.add_system("s2", ecs_system.new())
+world.add_system("s3", ecs_system.new())
 
 # add command
 world.add_command("my_command", ecs_command)
