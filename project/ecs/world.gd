@@ -300,8 +300,14 @@ func has_command(name: String):
 func add_listener(name: String, listener: Object, function: String):
 	_event_pool.add(name, listener, function)
 	
+func add_callable(name: String, c: Callable):
+	_event_pool.add_callable(name, c)
+	
 func remove_listener(name: String, listener: Object):
 	_event_pool.remove(name, listener)
+	
+func remove_callable(name: String, c: Callable):
+	_event_pool.remove_callable(name, c)
 	
 func notify(event_name: String, value = null):
 	_event_pool.notify(event_name, value)
