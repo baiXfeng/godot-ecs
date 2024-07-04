@@ -24,7 +24,7 @@ class my_system extends ecs_system:
 	# override
 	func _on_enter(w: ecs_world):
 		w.add_listener("on_process", self, "_on_process")
-		components = world().fetch_components("my_component")
+		components = world().view("my_component")
 		
 	# override
 	func _on_exit(w: ecs_world):

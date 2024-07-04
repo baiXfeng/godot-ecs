@@ -21,8 +21,18 @@ func _init():
 	
 func test_entity():
 	_entity = _world.create_entity()
+	_entity.add_to_group("first_entity")
+	_entity.add_to_group("test_group")
+	
 	var e = _world.get_entity(_entity.id())
 	printt("entity id is equality:", e.id() == _entity.id())
+	
+	var first_entity_group = _world.group("first_entity")
+	printt("first entity group:", first_entity_group.size(), first_entity_group.front().id())
+	
+	var test_entity_group = _world.group("test_group")
+	printt("test entity group:", test_entity_group.size(), test_entity_group.front().id())
+	
 	print("")
 	
 func test_component():

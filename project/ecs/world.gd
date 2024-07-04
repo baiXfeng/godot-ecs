@@ -130,6 +130,9 @@ func fetch_components(name: String) -> Array:
 		return []
 	return _type_component_dict[name].keys()
 	
+func view(name: String) -> Array:
+	return fetch_components(name)
+	
 var _group_entity_dict: Dictionary
 var _entity_groups: Dictionary
 	
@@ -174,6 +177,9 @@ func fetch_entities(group_name: String) -> Array:
 	if _group_entity_dict.has(group_name):
 		return _group_entity_dict[group_name].keys()
 	return []
+	
+func group(group_name: String) -> Array:
+	return fetch_entities(group_name)
 	
 func add_system(name: String, system) -> bool:
 	remove_system(name)

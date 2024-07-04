@@ -11,17 +11,22 @@ func world() -> ecs_world:
 	return _world.get_ref()
 	
 func get_remote_sender_id() -> int:
-	return get_tree().get_remote_sender_id()
+	return multiplayer.get_remote_sender_id()
 	
 func get_rpc_unique_id() -> int:
-	return get_tree().network_peer.get_unique_id()
+	return multiplayer.get_unique_id()
 	
 func is_server() -> bool:
-	return get_tree().is_server()
+	return multiplayer.is_server()
 	
-func is_rpc_valid() -> bool:
-	var peer: MultiplayerPeer  = get_tree().network_peer
-	return peer != null and peer.get_connection_status() == peer.CONNECTION_CONNECTED
+func is_peer_connected() -> bool:
+	return peer().get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	
+func peer() -> MultiplayerPeer:
+	return multiplayer.multiplayer_peer
+	
+func set_peer(peer: MultiplayerPeer):
+	multiplayer.multiplayer_peer = peer
 	
 func save(dict: Dictionary):
 	_on_save(dict)
