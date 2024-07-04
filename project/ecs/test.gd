@@ -21,8 +21,18 @@ func _init():
 	
 func test_entity():
 	_entity = _world.create_entity()
+	_entity.add_to_group("first_entity")
+	_entity.add_to_group("test_group")
+	
 	var e = _world.get_entity(_entity.id())
 	printt("entity id is equality:", e.id() == _entity.id())
+	
+	var first_entity_group = _world.group("first_entity")
+	printt("first entity group:", first_entity_group.size(), first_entity_group.front().id())
+	
+	var test_entity_group = _world.group("test_group")
+	printt("test entity group:", test_entity_group.size(), test_entity_group.front().id())
+	
 	print("")
 	
 func test_component():
@@ -152,11 +162,29 @@ class event_tester extends ecs_system:
 	func _on_event(e: ecs_event):
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
+class callable_event_tester extends  ecs_system:
+	func _on_enter(w: ecs_world):
+		w.add_callable("test", _on_event)
+		pass
+	func _on_exit(w: ecs_world):
+		w.remove_callable("test", _on_event)
+	func _on_event(e: ecs_event):
+		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
+	
 func test_event():
+	print("begin test add_listener for event:")
 	_world.add_system("test_event_system", event_tester.new())
 	_world.notify("test", "hello test event.")
 	_world.remove_system("test_event_system")
 	_world.notify("test", "hello test event.")
+	
+	print("\nbegin test add_callable for event:")
+	_world.add_system("test_event_system", callable_event_tester.new())
+	_world.notify("test", "hello test event.")
+	_world.remove_system("test_event_system")
+	_world.notify("test", "hello test event.")
+	
+	print("")
 	
 class _cmd extends ecs_command:
 	func _init():

@@ -130,6 +130,9 @@ func fetch_components(name: String) -> Array:
 		return []
 	return _type_component_dict[name].keys()
 	
+func view(name: String) -> Array:
+	return fetch_components(name)
+	
 var _group_entity_dict: Dictionary
 var _entity_groups: Dictionary
 	
@@ -174,6 +177,9 @@ func fetch_entities(group_name: String) -> Array:
 	if _group_entity_dict.has(group_name):
 		return _group_entity_dict[group_name].keys()
 	return []
+	
+func group(group_name: String) -> Array:
+	return fetch_entities(group_name)
 	
 func add_system(name: String, system) -> bool:
 	remove_system(name)
@@ -294,8 +300,14 @@ func has_command(name: String):
 func add_listener(name: String, listener: Object, function: String):
 	_event_pool.add(name, listener, function)
 	
+func add_callable(name: String, c: Callable):
+	_event_pool.add_callable(name, c)
+	
 func remove_listener(name: String, listener: Object):
 	_event_pool.remove(name, listener)
+	
+func remove_callable(name: String, c: Callable):
+	_event_pool.remove_callable(name, c)
 	
 func notify(event_name: String, value = null):
 	_event_pool.notify(event_name, value)

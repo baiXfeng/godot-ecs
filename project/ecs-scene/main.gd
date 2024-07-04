@@ -23,12 +23,12 @@ class my_system extends ecs_system:
 	
 	# override
 	func _on_enter(w: ecs_world):
-		w.add_listener("on_process", self, "_on_process")
-		components = world().fetch_components("my_component")
+		w.add_callable("on_process", _on_process)
+		components = world().view("my_component")
 		
 	# override
 	func _on_exit(w: ecs_world):
-		w.remove_listener("on_process", self)
+		w.remove_callable("on_process", _on_process)
 		
 	func _on_process(e: ecs_event):
 		# event param
