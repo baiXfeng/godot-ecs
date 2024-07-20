@@ -6,8 +6,7 @@ Lightweight ecs framework wirtten with gdscript.
 # Features
 
 - Lightweight and high-performance.
-- Independent of Node components.
-- Components and systems support serialization and deserialization.
+- Components support serialization and deserialization.
 - Easy to use.
 
 # How To Use
@@ -40,8 +39,8 @@ world.add_command("my_command", ecs_command)
 world.notify("my_notification", with_param)
 world.notify("my_command", with_param)
 
-# fetch components
-var component_list = world.fetch_components("c1")
+# view components
+var component_list = world.view("c1")
 for c in component_list:
 	# get component from entity
 	var entity = c.entity()
@@ -63,6 +62,7 @@ for c in component_list:
 		entity_data[ cc.name() ] = data
 	var entity_id = e.id()
 	serialize_dict[ entity_id ] = entity_data
+
 printt("this is entity serialize data", serialize_dict)
 
 ```
