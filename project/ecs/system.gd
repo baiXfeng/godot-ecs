@@ -34,12 +34,6 @@ func peer() -> MultiplayerPeer:
 func set_peer(peer: MultiplayerPeer):
 	multiplayer.multiplayer_peer = peer
 	
-func save(dict: Dictionary):
-	_on_save(dict)
-	
-func load(dict: Dictionary):
-	_on_load(dict)
-	
 func on_enter(w: ecs_world):
 	if w.debug_print:
 		print("system <%s:%s> on_enter." % [world().name(), _name])
@@ -65,14 +59,6 @@ func _on_enter(w: ecs_world):
 	
 # override
 func _on_exit(w: ecs_world):
-	pass
-	
-# override
-func _on_save(dict: Dictionary):
-	pass
-	
-# override
-func _on_load(dict: Dictionary):
 	pass
 	
 # ==============================================================================

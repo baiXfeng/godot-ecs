@@ -122,20 +122,6 @@ func test_snapshot():
 	print("\nentity snapshot:")
 	print(data)
 	
-	var sys_keys = _world.get_system_keys()
-	var sys_data = {}
-	for k in sys_keys:
-		var s: ecs_system = _world.get_system(k)
-		var temp_data = {}
-		printt("\nstart save system [%s] ..." % s.name())
-		s.save(temp_data)
-		printt("save system:", temp_data)
-		sys_data[ s.name() ] = temp_data
-		printt("system [%s] save completed." % s.name())
-	# save system data
-	print("\nsystem snapshot:")
-	print(sys_data)
-	
 	print("")
 	
 class event_tester extends ecs_system:

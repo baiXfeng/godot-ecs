@@ -57,7 +57,7 @@ class my_command extends ecs_command:
 		var serialize_data = {}
 		
 		# fetch components
-		var player_units = world.fetch_components("player_unit")
+		var player_units = world.view("player_unit")
 		for unit in player_units:
 			var e: ecs_entity = unit.entity()
 			var all_components = e.get_components()
