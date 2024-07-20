@@ -16,6 +16,12 @@ func execute(e: ecs_event):
 func world() -> ecs_world:
 	return _world.get_ref()
 	
+func view(name: String) -> Array:
+	return world().view(name)
+	
+func group(name: String) -> Array:
+	return world().group(name)
+	
 # ==============================================================================
 # override
 func _on_execute(e: ecs_event):

@@ -1,4 +1,4 @@
-extends RefCounted
+extends Node
 class_name ecs_system
 
 var _name: String
@@ -9,6 +9,30 @@ func name() -> String:
 	
 func world() -> ecs_world:
 	return _world.get_ref()
+	
+func view(name: String) -> Array:
+	return world().view(name)
+	
+func group(name: String) -> Array:
+	return world().group(name)
+	
+func get_remote_sender_id() -> int:
+	return multiplayer.get_remote_sender_id()
+	
+func get_rpc_unique_id() -> int:
+	return multiplayer.get_unique_id()
+	
+func is_server() -> bool:
+	return multiplayer.is_server()
+	
+func is_peer_connected() -> bool:
+	return peer().get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	
+func peer() -> MultiplayerPeer:
+	return multiplayer.multiplayer_peer
+	
+func set_peer(peer: MultiplayerPeer):
+	multiplayer.multiplayer_peer = peer
 	
 func save(dict: Dictionary):
 	_on_save(dict)
@@ -53,6 +77,10 @@ func _on_load(dict: Dictionary):
 	
 # ==============================================================================
 # private function
+	
+func _init(parent: Node = null):
+	if parent:
+		parent.add_child(self)
 	
 func _set_name(n: String):
 	_name = n

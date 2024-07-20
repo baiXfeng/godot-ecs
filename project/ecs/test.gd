@@ -9,7 +9,6 @@ func _init():
 	test_entity()
 	test_component()
 	test_system()
-	test_rpc_system()
 	test_remove_component()
 	test_remove_entity()
 	test_remove_system()
@@ -48,20 +47,6 @@ func test_system():
 	_world.add_system("s2", ecs_system.new())
 	_world.add_system("s2", ecs_system.new())
 	_world.add_system("s3", ecs_system.new())
-	print("")
-	
-func test_rpc_system():
-	_world.add_rpc_system("rpc_s1", rpc_system.new(null))
-	_world.add_rpc_system("rpc_s2", rpc_system.new(null))
-	_world.add_rpc_system("rpc_s2", rpc_system.new(null))
-	_world.add_rpc_system("rpc_s3", rpc_system.new(null))
-	
-	printt("get rpc system:", _world.get_rpc_system("rpc_s1"), "has rpc system:", _world.has_rpc_system("rpc_s2"))
-	
-	_world.remove_all_rpc_systems()
-	
-	printt("get rpc system:", _world.get_rpc_system("rpc_s1"), "has rpc system:", _world.has_rpc_system("rpc_s2"))
-	
 	print("")
 	
 func test_remove_component():
