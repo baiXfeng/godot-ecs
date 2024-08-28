@@ -8,7 +8,6 @@ var _name: String
 var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
-var _rpc_system_pool: Dictionary
 var _command_pool: Dictionary
 var _event_pool: ecs_event_center = ecs_event_center.new()
 
@@ -211,40 +210,6 @@ func get_system_keys() -> Array:
 	
 func has_system(name: String) -> bool:
 	return _system_pool.has(name)
-	
-func add_rpc_system(name: String, system) -> bool:
-	remove_rpc_system(name)
-	_rpc_system_pool[name] = system
-	system._set_name(name)
-	system._set_world(self)
-	system.on_enter(self)
-	return true
-	
-func remove_rpc_system(name: String, queue_free: bool = true) -> bool:
-	if not _rpc_system_pool.has(name):
-		return false
-	var system = _rpc_system_pool[name]
-	system.on_exit(self)
-	if queue_free:
-		system.queue_free()
-	return _rpc_system_pool.erase(name)
-	
-func remove_all_rpc_systems() -> bool:
-	var keys = _rpc_system_pool.keys()
-	for name in keys:
-		remove_rpc_system(name)
-	return true
-	
-func get_rpc_system(name: String):
-	if not _rpc_system_pool.has(name):
-		return null
-	return _rpc_system_pool[name]
-	
-func get_rpc_system_keys() -> Array:
-	return _rpc_system_pool.keys()
-	
-func has_rpc_system(name: String) -> bool:
-	return _rpc_system_pool.has(name)
 	
 class _command_shell extends RefCounted:
 	var _debug_print: bool

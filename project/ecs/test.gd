@@ -18,6 +18,10 @@ func _init():
 	test_command()
 	test_entity_add_to_group()
 	
+func queue_free():
+	_entity = null
+	_world.clear()
+	
 func test_entity():
 	_entity = _world.create_entity()
 	_entity.add_to_group("first_entity")
@@ -136,7 +140,6 @@ class event_tester extends ecs_system:
 class callable_event_tester extends  ecs_system:
 	func _on_enter(w: ecs_world):
 		w.add_callable("test", _on_event)
-		pass
 	func _on_exit(w: ecs_world):
 		w.remove_callable("test", _on_event)
 	func _on_event(e: ecs_event):

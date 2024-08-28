@@ -43,6 +43,7 @@ func on_exit(w: ecs_world):
 	if w.debug_print:
 		print("system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
+	queue_free()
 	
 func notify(event_name: String, value = null):
 	world().notify(event_name, value)
