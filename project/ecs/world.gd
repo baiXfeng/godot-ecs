@@ -130,8 +130,13 @@ func view(name: String) -> Array:
 		return []
 	return _type_component_dict[name].keys()
 	
-func multiview(names: Array[String]) -> Array:
-	return []
+func multi_view(names: Array[String]) -> Array:
+	var result = []
+	for c in view(names.front()) as Array[ecs_component]:
+		var e = c.entity()
+		if _is_satisfy_components(e, names):
+			result.append(_get_satisfy_components(e, names))
+	return result
 	
 var _group_entity_dict: Dictionary
 var _entity_groups: Dictionary
@@ -282,4 +287,16 @@ func _get_type_list(name: String) -> Dictionary:
 	if not _type_component_dict.has(name):
 		_type_component_dict[name] = {}
 	return _type_component_dict[name]
+	
+func _is_satisfy_components(e: ecs_entity, names: Array[String]) -> bool:
+	for key in names:
+		if not has_component(e.id(), key):
+			return false
+	return true
+	
+func _get_satisfy_components(e: ecs_entity, names: Array[String]) -> Dictionary:
+	var result = {}
+	for key in names:
+		result[key] = get_component(e.id(), key)
+	return result
 	

@@ -97,6 +97,11 @@ func _ready():
 	# add command, use class resource, not instance
 	_world.add_command("save_game_command", my_command)
 	
+	# view components with multi keys
+	for dict in _world.multi_view(["player_unit", "my_component"]):
+		for key in dict:
+			printt("component:", dict[key])
+	
 func _process(delta):
 	
 	# system on process
