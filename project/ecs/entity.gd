@@ -13,30 +13,35 @@ func _init(id: int, world):
 	
 func destroy():
 	world().remove_entity(_id)
+	_id = 0
 	
 func id() -> int:
 	return _id
 	
-func world():
+func world() -> ecs_world:
 	return _world.get_ref()
 	
 func valid() -> bool:
-	return world().has_entity(_id)
+	return _id >= 1 and world().has_entity(_id)
 	
 func notify(event_name: String, value = null):
+	if _id == 0:
+		return
 	world().notify(event_name, value)
 	
 func send(e: ecs_event):
+	if _id == 0:
+		return
 	world().send(e)
 	
-func add_component(name: String, component) -> bool:
+func add_component(name: String, component = ecs_component.new()) -> bool:
 	return world().add_component(_id, name, component)
 	
 func remove_component(name: String) -> bool:
 	return world().remove_component(_id, name)
 	
 func remove_all_components() -> bool:
-	return world().remove_all_components()
+	return world().remove_all_components(_id)
 	
 func get_component(name: String):
 	return world().get_component(_id, name)

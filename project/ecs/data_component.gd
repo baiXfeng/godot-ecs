@@ -3,7 +3,7 @@ class_name ecs_data_component
 
 var data
 
-signal on_data_changed(sender, data)
+signal on_data_changed(sender: ecs_data_component, data)
 
 func _init(d):
 	data = d

@@ -59,7 +59,7 @@ func get_entity_keys() -> Array:
 func has_entity(id: int) -> bool:
 	return _entity_pool.has(id)
 	
-func add_component(entity_id: int, name: String, component) -> bool:
+func add_component(entity_id: int, name: String, component = ecs_component.new()) -> bool:
 	if not has_entity(entity_id):
 		return false
 	var entity_dict = _entity_component_dict[entity_id]
@@ -254,8 +254,7 @@ func remove_command(name: String) -> bool:
 	return _command_pool.erase(name)
 	
 func remove_all_commands() -> bool:
-	var keys = _command_pool.keys()
-	for name in keys:
+	for name in _command_pool.keys():
 		remove_command(name)
 	return true
 	
@@ -275,9 +274,13 @@ func remove_callable(name: String, c: Callable):
 	_event_pool.remove_callable(name, c)
 	
 func notify(event_name: String, value = null):
+	if debug_print:
+		print('notify <%s> "%s", %s.' % [_name, event_name, value])
 	_event_pool.notify(event_name, value)
 	
 func send(e: ecs_event):
+	if debug_print:
+		print('send <%s> "%s", %s.' % [_name, e.name, e.data])
 	_event_pool.send(e)
 	
 func _get_type_list(name: String) -> Dictionary:
