@@ -2,6 +2,7 @@ extends RefCounted
 class_name ecs_world
 
 var debug_print: bool
+var ignore_notify_log: Dictionary # ignore notify log
 
 var _name: String
 
@@ -274,12 +275,12 @@ func remove_callable(name: String, c: Callable):
 	_event_pool.remove_callable(name, c)
 	
 func notify(event_name: String, value = null):
-	if debug_print:
+	if debug_print and not ignore_notify_log.has(event_name):
 		print('notify <%s> "%s", %s.' % [_name, event_name, value])
 	_event_pool.notify(event_name, value)
 	
 func send(e: ecs_event):
-	if debug_print:
+	if debug_print and not ignore_notify_log.has(e.name):
 		print('send <%s> "%s", %s.' % [_name, e.name, e.data])
 	_event_pool.send(e)
 	
