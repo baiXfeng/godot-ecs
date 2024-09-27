@@ -73,7 +73,7 @@ func test_remove_entity():
 	else:
 		for key in list:
 			print("entity [%d]" % key)
-	list = _world.fetch_components("c2")
+	list = _world.view("c2")
 	print("component list:")
 	if list.is_empty():
 		print("component list is empty.")
@@ -100,14 +100,14 @@ func mixed_test():
 	_entity.add_component("c3", ecs_component.new())
 	_world.add_system("s1", ecs_system.new())
 	
-	var list = _world.fetch_components("c1")
+	var list = _world.view("c1")
 	print("mixed test component list:")
 	for c in list:
 		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
 	printt("mixed test system list:", _world.get_system_keys())
 	
 func test_snapshot():
-	var list = _world.fetch_components("c1")
+	var list = _world.view("c1")
 	var data = {}
 	for c in list:
 		var e: ecs_entity = c.entity()

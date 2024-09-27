@@ -125,13 +125,13 @@ func has_component(entity_id: int, name: String) -> bool:
 	var entity_dict = _entity_component_dict[entity_id]
 	return entity_dict.has(name)
 	
-func fetch_components(name: String) -> Array:
+func view(name: String) -> Array:
 	if not _type_component_dict.has(name):
 		return []
 	return _type_component_dict[name].keys()
 	
-func view(name: String) -> Array:
-	return fetch_components(name)
+func multiview(names: Array[String]) -> Array:
+	return []
 	
 var _group_entity_dict: Dictionary
 var _entity_groups: Dictionary
