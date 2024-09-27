@@ -130,10 +130,10 @@ func test_snapshot():
 	
 class event_tester extends ecs_system:
 	func _on_enter(w: ecs_world):
-		w.add_listener("test", self, "_on_event")
+		w.add_callable("test", _on_event)
 		pass
 	func _on_exit(w: ecs_world):
-		w.remove_listener("test", self)
+		w.remove_callable("test", _on_event)
 	func _on_event(e: ecs_event):
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	

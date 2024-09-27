@@ -3,17 +3,10 @@ class_name ecs_event_center
 	
 var _event_dict: Dictionary
 	
-func add(name: String, listener: Object, function: String) -> bool:
-	return add_callable(name, Callable(listener, function))
-	
 func add_callable(name: String, c: Callable) -> bool:
 	var dict = _get_event_dict(name)
 	dict[c.get_object()] = c
 	return true
-	
-func remove(name: String, listener: Object) -> bool:
-	var dict = _get_event_dict(name)
-	return dict.erase(listener)
 	
 func remove_callable(name: String, c: Callable) -> bool:
 	var dict = _get_event_dict(name)
