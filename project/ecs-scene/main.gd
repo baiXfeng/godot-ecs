@@ -82,6 +82,8 @@ func _ready():
 	
 	# debug print on
 	_world.debug_print = true
+	# ignore on_process log
+	_world.ignore_notify_log["on_process"] = true
 	
 	# create entity
 	var e = _world.create_entity()
