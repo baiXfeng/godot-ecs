@@ -108,21 +108,16 @@ class load_game_command extends ecs_command:
 		var game_data = _load_json("user://game.save")
 		if game_data != null:
 			
-			# remove all player_unit entity
-			for c in view("player_unit") as Array[ecs_component]:
-				c.entity().destroy()
+			# who load data
+			var entity: ecs_entity = view("player_unit").front().entity()
+			var my_comp: my_component = entity.get_component("my_component")
 			
 			# load data
 			var entity_data: Dictionary = game_data.data
-			var entity = world().create_entity()
 			for key in entity_data.keys():
 				match key:
-					"player_unit":
-						entity.add_component(key)
 					"my_component":
-						var c = my_component.new()
-						c.load(entity_data[key])
-						entity.add_component(key, c)
+						my_comp.load(entity_data[key])
 			
 			# print
 			print(game_data)
@@ -177,25 +172,26 @@ func _ready():
 		for key in dict:
 			printt("key: ", key, "value: ", dict[key])
 	
+	# connect component
+	for c in e.world().view("my_component") as Array[my_component]:
+		c.on_score_changed.connect(_on_score_changed)
+		c.on_seconds_changed.connect(_on_seconds_changed)
+	
 	# load game data
 	_world.notify("load_game_command")
 	
 func _on_game_data_component_added(e: ecs_entity, c: ecs_component):
 	match c.name():
 		"game:data:loaded":
-			# connect component
-			for my_comp in e.world().view("my_component") as Array[my_component]:
-				my_comp.on_score_changed.connect(_on_score_changed)
-				my_comp.on_seconds_changed.connect(_on_seconds_changed)
 			# tips
 			_tips.text = "Game data loaded."
-			await get_tree().create_timer(1).timeout
-			_tips.text = ""
 		"game:data:saved":
 			# tips
 			_tips.text = "Game data saved."
-			await get_tree().create_timer(1).timeout
-			_tips.text = ""
+		_:
+			return
+	await get_tree().create_timer(1).timeout
+	_tips.text = ""
 	
 func _on_score_changed(value: int):
 	_score.text = "Score: %d" % value
