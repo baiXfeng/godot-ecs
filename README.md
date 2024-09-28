@@ -49,6 +49,10 @@ for c in component_list:
 	var c3 = entity.get_component("c3")
 	# get entity's all components
 	var all_components = entity.get_components()
+
+# multi view components
+for dict in world.multi_view(["c1", "c2", "c3"])
+	print(dict)
 	
 # serialize components
 var serialize_dict = {}

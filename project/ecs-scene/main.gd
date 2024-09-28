@@ -3,8 +3,18 @@ extends Node2D
 # my component class extends ecs_component
 class my_component extends ecs_component:
 	
-	var value1: int
-	var value2: float
+	var value1: int:
+		set(v):
+			value1 = v
+			on_score_changed.emit(value1)
+	
+	var value2: float:
+		set(v):
+			value2 = v
+			on_seconds_changed.emit(value2)
+	
+	signal on_score_changed(value: int)
+	signal on_seconds_changed(value: float)
 	
 	# override
 	func _on_save(dict: Dictionary):
@@ -13,18 +23,15 @@ class my_component extends ecs_component:
 	
 	# override
 	func _on_load(dict: Dictionary):
-		value1 = dict["value1"]
-		value2 = dict["value2"]
+		value1 = dict["value1"] as int
+		value2 = dict["value2"] as float
 	
 # my system class extends ecs_system
 class my_system extends ecs_system:
 	
-	var components: Array
-	
 	# override
 	func _on_enter(w: ecs_world):
 		w.add_callable("on_process", _on_process)
-		components = world().view("my_component")
 		
 	# override
 	func _on_exit(w: ecs_world):
@@ -34,19 +41,19 @@ class my_system extends ecs_system:
 		# event param
 		var delta: float = e.data
 		# do some thing
-		for c in components:
+		for c in view("my_component") as Array[my_component]:
 			c.value1 += 1
 			c.value2 += delta
 	
 # my command extends ecs_command
-class my_command extends ecs_command:
+class save_game_command extends ecs_command:
 	
 	func _init():
-		print("my_command created.")
+		print("save_game_command created.")
 	
 	# override
 	func _on_execute(e: ecs_event):
-		print("my_command execute.")
+		print("save_game_command execute.")
 		_on_save_game(e)
 	
 	func _on_save_game(event: ecs_event):
@@ -67,13 +74,75 @@ class my_command extends ecs_command:
 				var data = {}
 				c.save( data )
 				entity_data[ c.name() ] = data
-			serialize_data[ e.id() ] = entity_data
+			serialize_data[ "data" ] = entity_data
 		
 		# print entity serialize data
 		printt("serialize data:", serialize_data)
+		
+		# save to file
+		_write_to_disk(serialize_data)
+		
+		# notify game data
+		view("game_data").front().entity().add_component("game:data:saved")
+	
+	func _write_to_disk(dict: Dictionary):
+		var f := FileAccess.open("user://game.save", FileAccess.WRITE)
+		if f:
+			var data = JSON.stringify(dict)
+			f.store_string(data)
+			f.close()
+	
+class load_game_command extends ecs_command:
+	
+	func _init():
+		print("load_game_command created.")
+	
+	# override
+	func _on_execute(e: ecs_event):
+		print("load_game_command execute.")
+		_on_load_game(e)
+	
+	func _on_load_game(e: ecs_event):
+		
+		# load file
+		var game_data = _load_json("user://game.save")
+		if game_data != null:
+			
+			# remove all player_unit entity
+			for c in view("player_unit") as Array[ecs_component]:
+				c.entity().destroy()
+			
+			# load data
+			var entity_data: Dictionary = game_data.data
+			var entity = world().create_entity()
+			for key in entity_data.keys():
+				match key:
+					"player_unit":
+						entity.add_component(key)
+					"my_component":
+						var c = my_component.new()
+						c.load(entity_data[key])
+						entity.add_component(key, c)
+			
+			# print
+			print(game_data)
+			
+			# notify game data
+			view("game_data").front().entity().add_component("game:data:loaded")
+	
+	func _load_json(path: String):
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f:
+			var json_text = f.get_as_text()
+			return JSON.parse_string(json_text)
+		return null
 	
 # create ecs world
 var _world: ecs_world = ecs_world.new()
+	
+@onready var _score = $VBoxContainer/Scroe
+@onready var _time = $VBoxContainer/Time
+@onready var _tips = $VBoxContainer/Tips
 	
 func _ready():
 	
@@ -91,24 +160,61 @@ func _ready():
 	e.add_component("player_unit", ecs_component.new())
 	e.add_component("my_component", my_component.new())
 	
+	# game data entity
+	var game_data = _world.create_entity()
+	game_data.add_component("game_data")
+	game_data.on_component_added.connect(_on_game_data_component_added)
+	
 	# add system
 	_world.add_system("my_system", my_system.new())
 	
 	# add command, use class resource, not instance
-	_world.add_command("save_game_command", my_command)
+	_world.add_command("save_game_command", save_game_command)
+	_world.add_command("load_game_command", load_game_command)
 	
 	# view components with multi keys
 	for dict in _world.multi_view(["player_unit", "my_component"]):
 		for key in dict:
-			printt("component:", dict[key])
+			printt("key: ", key, "value: ", dict[key])
+	
+	# load game data
+	_world.notify("load_game_command")
+	
+func _on_game_data_component_added(e: ecs_entity, c: ecs_component):
+	match c.name():
+		"game:data:loaded":
+			# connect component
+			for my_comp in e.world().view("my_component") as Array[my_component]:
+				my_comp.on_score_changed.connect(_on_score_changed)
+				my_comp.on_seconds_changed.connect(_on_seconds_changed)
+			# tips
+			_tips.text = "Game data loaded."
+			await get_tree().create_timer(1).timeout
+			_tips.text = ""
+		"game:data:saved":
+			# tips
+			_tips.text = "Game data saved."
+			await get_tree().create_timer(1).timeout
+			_tips.text = ""
+	
+func _on_score_changed(value: int):
+	_score.text = "Score: %d" % value
+	
+func _on_seconds_changed(value: float):
+	_time.text = "Seconds: %.2f" % value
 	
 func _process(delta):
 	
 	# system on process
 	_world.notify("on_process", delta)
 	
-func _on_Button_pressed():
+func _on_load_pressed() -> void:
 	
-	# system on event
+	# load data
+	_world.notify("load_game_command")
+	
+func _on_save_pressed() -> void:
+	
+	# save data
 	_world.notify("save_game_command")
 	
