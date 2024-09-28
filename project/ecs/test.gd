@@ -105,6 +105,7 @@ func mixed_test():
 	for c in list:
 		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
 	printt("mixed test system list:", _world.get_system_keys())
+	printt("multi view list:", _world.multi_view(["c1", "c2"]))
 	
 func test_snapshot():
 	var list = _world.view("c1")

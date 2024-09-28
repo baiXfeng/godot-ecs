@@ -19,6 +19,9 @@ func world() -> ecs_world:
 func view(name: String) -> Array:
 	return world().view(name)
 	
+func multi_view(names: Array[String]) -> Array:
+	return world().multi_view(names)
+	
 func group(name: String) -> Array:
 	return world().group(name)
 	

@@ -12,8 +12,9 @@ func _init(id: int, world):
 	_world = weakref(world)
 	
 func destroy():
-	world().remove_entity(_id)
-	_id = 0
+	if _id != 0:
+		world().remove_entity(_id)
+		_id = 0
 	
 func id() -> int:
 	return _id
