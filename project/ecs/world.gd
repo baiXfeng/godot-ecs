@@ -39,7 +39,7 @@ func remove_entity(entity_id: int) -> bool:
 	if not remove_all_components(entity_id):
 		return false
 	if debug_print:
-		print("entity <%s:%d> destroyed." % [_name, _entity_id])
+		print("entity <%s:%d> destroyed." % [_name, entity_id])
 	_entity_component_dict.erase(entity_id)
 	return _entity_pool.erase(entity_id)
 	
