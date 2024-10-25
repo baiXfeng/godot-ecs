@@ -4,27 +4,38 @@ class_name ecs_event_center
 var _event_dict: Dictionary
 	
 func add_callable(name: String, c: Callable) -> bool:
-	var dict = _get_event_dict(name)
-	dict[c.get_object()] = c
-	return true
+	return _get_event_listener(name).add(c)
 	
 func remove_callable(name: String, c: Callable) -> bool:
-	var dict = _get_event_dict(name)
-	return dict.erase(c.get_object())
+	return _get_event_listener(name).remove(c)
 	
 func notify(name: String, value):
 	send( ecs_event.new(name, value) )
 	
 func send(e: ecs_event):
-	var dict = _get_event_dict(e.name)
-	for key in dict:
-		dict[key].call(e)
+	_get_event_listener(e.name).receive(e)
 	
 func clear():
 	_event_dict.clear()
 	
-func _get_event_dict(name: String) -> Dictionary:
+func _get_event_listener(name: String) -> _listener:
 	if not _event_dict.has(name):
-		_event_dict[name] = {}
+		_event_dict[name] = _listener.new()
 	return _event_dict[name]
+	
+# implement listener
+class _listener extends RefCounted:
+	signal _impl(e: ecs_event)
+	func add(c: Callable) -> bool:
+		if _impl.is_connected(c):
+			return false
+		_impl.connect(c)
+		return true
+	func remove(c: Callable) -> bool:
+		if not _impl.is_connected(c):
+			return false
+		_impl.disconnect(c)
+		return true
+	func receive(e: ecs_event):
+		_impl.emit(e)
 	
