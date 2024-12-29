@@ -44,8 +44,7 @@ func remove_entity(entity_id: int) -> bool:
 	return _entity_pool.erase(entity_id)
 	
 func remove_all_entities() -> bool:
-	var keys = _entity_pool.keys()
-	for entity_id in keys:
+	for entity_id in _entity_pool.keys():
 		remove_entity(entity_id)
 	return true
 	
@@ -61,14 +60,8 @@ func has_entity(id: int) -> bool:
 	return _entity_pool.has(id)
 	
 func add_component(entity_id: int, name: String, component = ecs_component.new()) -> bool:
-	if not has_entity(entity_id):
+	if not _add_entity_component(entity_id, name, component):
 		return false
-	var entity_dict: Dictionary = _entity_component_dict[entity_id]
-	var type_list: Dictionary = _get_type_list(name)
-	if entity_dict.has(name):
-		type_list.erase(entity_dict[name])
-	entity_dict[name] = component
-	type_list[component] = true
 	component._name = name
 	component._entity = get_entity(entity_id)
 	component._set_world(self)
@@ -80,21 +73,15 @@ func add_component(entity_id: int, name: String, component = ecs_component.new()
 	return true
 	
 func remove_component(entity_id: int, name: String) -> bool:
-	if not has_entity(entity_id):
+	var c = get_component(entity_id, name)
+	if not c or not _remove_entity_component(entity_id, name):
 		return false
-	var entity_dict = _entity_component_dict[entity_id]
-	if not entity_dict.has(name):
-		return false
-	var type_list = _type_component_dict[name]
-	var c = entity_dict[name]
-	type_list.erase(c)
 	if debug_print:
 		print("component <%s:%s> remove from entity <%d>." % [_name, name, entity_id])
-	var sucessed = entity_dict.erase(name)
 	# 实体组件移除信号
 	var entity: ecs_entity = c._entity
 	entity.on_component_removed.emit(entity, c)
-	return sucessed
+	return true
 	
 func remove_all_components(entity_id: int) -> bool:
 	if not has_entity(entity_id):
@@ -116,10 +103,7 @@ func get_components(entity_id: int) -> Array:
 	if not has_entity(entity_id):
 		return []
 	var entity_dict = _entity_component_dict[entity_id]
-	var ret = []
-	for key in entity_dict:
-		ret.append(entity_dict[key])
-	return ret
+	return entity_dict.values()
 	
 func has_component(entity_id: int, name: String) -> bool:
 	if not has_entity(entity_id):
@@ -130,7 +114,7 @@ func has_component(entity_id: int, name: String) -> bool:
 func view(name: String) -> Array:
 	if not _type_component_dict.has(name):
 		return []
-	return _type_component_dict[name].keys()
+	return _type_component_dict[name].values()
 	
 func multi_view(names: Array[String]) -> Array:
 	var result = []
@@ -203,8 +187,7 @@ func remove_system(name: String) -> bool:
 	return _system_pool.erase(name)
 	
 func remove_all_systems() -> bool:
-	var keys = _system_pool.keys()
-	for name in keys:
+	for name in _system_pool.keys():
 		remove_system(name)
 	return true
 	
@@ -301,4 +284,21 @@ func _get_satisfy_components(e: ecs_entity, names: Array[String]) -> Dictionary:
 	for key in names:
 		result[key] = get_component(e.id(), key)
 	return result
+	
+func _add_entity_component(entity_id: int, name: String, component: ecs_component) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var entity_dict: Dictionary = _entity_component_dict[entity_id]
+	entity_dict[name] = component
+	var type_list: Dictionary = _get_type_list(name)
+	type_list[entity_id] = component
+	return true
+	
+func _remove_entity_component(entity_id: int, name: String) -> bool:
+	if not has_entity(entity_id):
+		return false
+	var type_list = _type_component_dict[name]
+	type_list.erase(entity_id)
+	var entity_dict = _entity_component_dict[entity_id]
+	return entity_dict.erase(name)
 	
