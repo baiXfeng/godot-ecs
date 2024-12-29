@@ -63,8 +63,10 @@ func has_entity(id: int) -> bool:
 func add_component(entity_id: int, name: String, component = ecs_component.new()) -> bool:
 	if not has_entity(entity_id):
 		return false
-	var entity_dict = _entity_component_dict[entity_id]
-	var type_list = _get_type_list(name)
+	var entity_dict: Dictionary = _entity_component_dict[entity_id]
+	var type_list: Dictionary = _get_type_list(name)
+	if entity_dict.has(name):
+		type_list.erase(entity_dict[name])
 	entity_dict[name] = component
 	type_list[component] = true
 	component._name = name
