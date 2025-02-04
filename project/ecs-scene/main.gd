@@ -1,7 +1,7 @@
 extends Node2D
 
-# my component class extends ecs_component
-class my_component extends ecs_component:
+# my component class extends ECSComponent
+class my_component extends ECSComponent:
 	
 	var value1: int:
 		set(v):
@@ -26,18 +26,18 @@ class my_component extends ecs_component:
 		value1 = dict["value1"] as int
 		value2 = dict["value2"] as float
 	
-# my system class extends ecs_system
-class my_system extends ecs_system:
+# my system class extends ECSSystem
+class my_system extends ECSSystem:
 	
 	# override
-	func _on_enter(w: ecs_world):
+	func _on_enter(w: ECSWorld):
 		w.add_callable("on_process", _on_process)
 		
 	# override
-	func _on_exit(w: ecs_world):
+	func _on_exit(w: ECSWorld):
 		w.remove_callable("on_process", _on_process)
 		
-	func _on_process(e: ecs_event):
+	func _on_process(e: ECSEvent):
 		# event param
 		var delta: float = e.data
 		# do some thing
@@ -45,20 +45,20 @@ class my_system extends ecs_system:
 			c.value1 += 1
 			c.value2 += delta
 	
-# my command extends ecs_command
-class save_game_command extends ecs_command:
+# my command extends ECSCommand
+class save_game_command extends ECSCommand:
 	
 	func _init():
 		print("save_game_command created.")
 	
 	# override
-	func _on_execute(e: ecs_event):
+	func _on_execute(e: ECSEvent):
 		print("save_game_command execute.")
 		_on_save_game(e)
 	
-	func _on_save_game(event: ecs_event):
+	func _on_save_game(event: ECSEvent):
 		# wrold
-		var world: ecs_world = self.world()
+		var world: ECSWorld = self.world()
 		
 		# serialize entity
 		var serialize_data = {}
@@ -66,7 +66,7 @@ class save_game_command extends ecs_command:
 		# fetch components
 		var player_units = world.view("player_unit")
 		for unit in player_units:
-			var e: ecs_entity = unit.entity()
+			var e: ECSEntity = unit.entity()
 			var all_components = e.get_components()
 			var entity_data = {}
 			# serialize component data to dictionary
@@ -92,24 +92,24 @@ class save_game_command extends ecs_command:
 			f.store_string(data)
 			f.close()
 	
-class load_game_command extends ecs_command:
+class load_game_command extends ECSCommand:
 	
 	func _init():
 		print("load_game_command created.")
 	
 	# override
-	func _on_execute(e: ecs_event):
+	func _on_execute(e: ECSEvent):
 		print("load_game_command execute.")
 		_on_load_game(e)
 	
-	func _on_load_game(e: ecs_event):
+	func _on_load_game(e: ECSEvent):
 		
 		# load file
 		var game_data = _load_json("user://game.save")
 		if game_data != null:
 			
 			# who load data
-			var entity: ecs_entity = view("player_unit").front().entity()
+			var entity: ECSEntity = view("player_unit").front().entity()
 			var my_comp: my_component = entity.get_component("my_component")
 			
 			# load data
@@ -133,7 +133,7 @@ class load_game_command extends ecs_command:
 		return null
 	
 # create ecs world
-var _world: ecs_world = ecs_world.new()
+var _world: ECSWorld = ECSWorld.new()
 	
 @onready var _score = $VBoxContainer/Scroe
 @onready var _time = $VBoxContainer/Time
@@ -142,7 +142,7 @@ var _world: ecs_world = ecs_world.new()
 func _ready():
 	
 	# run ecs test
-	ecs_test.new().queue_free()
+	ECSTest.new().queue_free()
 	
 	# debug print on
 	_world.debug_print = true
@@ -152,7 +152,7 @@ func _ready():
 	# create entity
 	var e = _world.create_entity()
 	# add component
-	e.add_component("player_unit", ecs_component.new())
+	e.add_component("player_unit", ECSComponent.new())
 	e.add_component("my_component", my_component.new())
 	
 	# game data entity
@@ -180,7 +180,7 @@ func _ready():
 	# load game data
 	_world.notify("load_game_command")
 	
-func _on_game_data_component_added(e: ecs_entity, c: ecs_component):
+func _on_game_data_component_added(e: ECSEntity, c: ECSComponent):
 	match c.name():
 		"game:data:loaded":
 			# tips

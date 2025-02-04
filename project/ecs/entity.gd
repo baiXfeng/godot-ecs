@@ -1,5 +1,5 @@
 extends RefCounted
-class_name ecs_entity
+class_name ECSEntity
 
 var _id: int
 var _world: WeakRef
@@ -19,7 +19,7 @@ func destroy():
 func id() -> int:
 	return _id
 	
-func world() -> ecs_world:
+func world() -> ECSWorld:
 	return _world.get_ref()
 	
 func valid() -> bool:
@@ -30,12 +30,12 @@ func notify(event_name: String, value = null):
 		return
 	world().notify(event_name, value)
 	
-func send(e: ecs_event):
+func send(e: ECSEvent):
 	if _id == 0:
 		return
 	world().send(e)
 	
-func add_component(name: String, component = ecs_component.new()) -> bool:
+func add_component(name: String, component = ECSComponent.new()) -> bool:
 	return world().add_component(_id, name, component)
 	
 func remove_component(name: String) -> bool:
