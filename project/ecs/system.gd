@@ -1,5 +1,5 @@
 extends Node
-class_name ecs_system
+class_name ECSSystem
 
 var _name: String
 var _world: WeakRef
@@ -7,7 +7,7 @@ var _world: WeakRef
 func name() -> String:
 	return _name
 	
-func world() -> ecs_world:
+func world() -> ECSWorld:
 	return _world.get_ref()
 	
 func view(name: String) -> Array:
@@ -37,12 +37,12 @@ func peer() -> MultiplayerPeer:
 func set_peer(peer: MultiplayerPeer):
 	multiplayer.multiplayer_peer = peer
 	
-func on_enter(w: ecs_world):
+func on_enter(w: ECSWorld):
 	if w.debug_print:
 		print("system <%s:%s> on_enter." % [world().name(), _name])
 	_on_enter(w)
 	
-func on_exit(w: ecs_world):
+func on_exit(w: ECSWorld):
 	if w.debug_print:
 		print("system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
@@ -51,18 +51,18 @@ func on_exit(w: ecs_world):
 func notify(event_name: String, value = null):
 	world().notify(event_name, value)
 	
-func send(e: ecs_event):
+func send(e: ECSEvent):
 	world().send(e)
 	
 # ==============================================================================
 # override function
 	
 # override
-func _on_enter(w: ecs_world):
+func _on_enter(w: ECSWorld):
 	pass
 	
 # override
-func _on_exit(w: ecs_world):
+func _on_exit(w: ECSWorld):
 	pass
 	
 # ==============================================================================
@@ -75,7 +75,7 @@ func _init(parent: Node = null):
 func _set_name(n: String):
 	_name = n
 	
-func _set_world(w: ecs_world):
+func _set_world(w: ECSWorld):
 	_world = weakref(w)
 	
 func _to_string() -> String:

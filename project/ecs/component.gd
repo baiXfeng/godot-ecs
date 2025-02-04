@@ -1,20 +1,20 @@
 extends RefCounted
-class_name ecs_component
+class_name ECSComponent
 
 var _name: String
-var _entity: ecs_entity
+var _entity: ECSEntity
 var _world: WeakRef
 
 func name() -> String:
 	return _name
 	
-func entity() -> ecs_entity:
+func entity() -> ECSEntity:
 	return _entity
 	
-func world() -> ecs_world:
+func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func _set_world(world: ecs_world):
+func _set_world(world: ECSWorld):
 	_world = weakref(world)
 	
 func _to_string() -> String:

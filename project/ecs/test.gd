@@ -1,8 +1,8 @@
 extends RefCounted
-class_name ecs_test
+class_name ECSTest
 
-var _world: ecs_world = ecs_world.new("ecs_world_test")
-var _entity: ecs_entity
+var _world: ECSWorld = ECSWorld.new("ECSWorld_test")
+var _entity: ECSEntity
 
 func _init():
 	_world.debug_print = true
@@ -39,18 +39,18 @@ func test_entity():
 	print("")
 	
 func test_component():
-	_entity.add_component("c1", ecs_component.new())
-	_entity.add_component("c2", ecs_component.new())
-	_entity.add_component("c3", ecs_component.new())
-	_entity.add_component("c4", ecs_data_component.new(11))
-	_entity.add_component("c5", ecs_view_component.new(null))
+	_entity.add_component("c1", ECSComponent.new())
+	_entity.add_component("c2", ECSComponent.new())
+	_entity.add_component("c3", ECSComponent.new())
+	_entity.add_component("c4", ECSDataComponent.new(11))
+	_entity.add_component("c5", ECSViewComponent.new(null))
 	print("")
 	
 func test_system():
-	_world.add_system("s1", ecs_system.new())
-	_world.add_system("s2", ecs_system.new())
-	_world.add_system("s2", ecs_system.new())
-	_world.add_system("s3", ecs_system.new())
+	_world.add_system("s1", ECSSystem.new())
+	_world.add_system("s2", ECSSystem.new())
+	_world.add_system("s2", ECSSystem.new())
+	_world.add_system("s3", ECSSystem.new())
 	print("")
 	
 func test_remove_component():
@@ -90,15 +90,15 @@ func test_remove_system():
 	
 func mixed_test():
 	var e = _world.create_entity()
-	e.add_component("c1", ecs_component.new())
-	e.add_component("c2", ecs_component.new())
-	e.add_component("c3", ecs_component.new())
+	e.add_component("c1", ECSComponent.new())
+	e.add_component("c2", ECSComponent.new())
+	e.add_component("c3", ECSComponent.new())
 	
 	_entity = _world.create_entity()
-	_entity.add_component("c1", ecs_component.new())
-	_entity.add_component("c2", ecs_component.new())
-	_entity.add_component("c3", ecs_component.new())
-	_world.add_system("s1", ecs_system.new())
+	_entity.add_component("c1", ECSComponent.new())
+	_entity.add_component("c2", ECSComponent.new())
+	_entity.add_component("c3", ECSComponent.new())
+	_world.add_system("s1", ECSSystem.new())
 	
 	var list = _world.view("c1")
 	print("mixed test component list:")
@@ -111,7 +111,7 @@ func test_snapshot():
 	var list = _world.view("c1")
 	var data = {}
 	for c in list:
-		var e: ecs_entity = c.entity()
+		var e: ECSEntity = c.entity()
 		var comps = e.get_components()
 		var entity_data = {}
 		printt("\nstart save entity [%d] ..." % e.id())
@@ -129,21 +129,21 @@ func test_snapshot():
 	
 	print("")
 	
-class event_tester extends ecs_system:
-	func _on_enter(w: ecs_world):
+class event_tester extends ECSSystem:
+	func _on_enter(w: ECSWorld):
 		w.add_callable("test", _on_event)
 		pass
-	func _on_exit(w: ecs_world):
+	func _on_exit(w: ECSWorld):
 		w.remove_callable("test", _on_event)
-	func _on_event(e: ecs_event):
+	func _on_event(e: ECSEvent):
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
-class callable_event_tester extends  ecs_system:
-	func _on_enter(w: ecs_world):
+class callable_event_tester extends  ECSSystem:
+	func _on_enter(w: ECSWorld):
 		w.add_callable("test", _on_event)
-	func _on_exit(w: ecs_world):
+	func _on_exit(w: ECSWorld):
 		w.remove_callable("test", _on_event)
-	func _on_event(e: ecs_event):
+	func _on_event(e: ECSEvent):
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
 func test_event():
@@ -161,10 +161,10 @@ func test_event():
 	
 	print("")
 	
-class _cmd extends ecs_command:
+class _cmd extends ECSCommand:
 	func _init():
 		print("test command init.")
-	func _on_execute(e: ecs_event):
+	func _on_execute(e: ECSEvent):
 		print("test command execute.")
 	
 func test_command():
