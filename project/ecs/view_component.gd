@@ -1,5 +1,5 @@
-extends ecs_component
-class_name ecs_view_component
+extends ECSComponent
+class_name ECSViewComponent
 
 var view: Node
 

@@ -1,5 +1,5 @@
 extends RefCounted
-class_name ecs_event
+class_name ECSEvent
 
 var name: String:
 	set(v):
@@ -30,5 +30,5 @@ func _init(n, d):
 	_data = d
 	
 func _to_string():
-	return "ecs_event(\"%s\", %s)" % [_name, _data]
+	return "ECSEvent(\"%s\", %s)" % [_name, _data]
 	

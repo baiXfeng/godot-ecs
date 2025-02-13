@@ -1,9 +1,9 @@
-extends ecs_component
-class_name ecs_data_component
+extends ECSComponent
+class_name ECSDataComponent
 
 var data
 
-signal on_data_changed(sender: ecs_data_component, data)
+signal on_data_changed(sender: ECSDataComponent, data)
 
 func _init(d):
 	data = d

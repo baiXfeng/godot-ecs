@@ -1,5 +1,5 @@
 extends RefCounted
-class_name ecs_world
+class_name ECSWorld
 
 var debug_print: bool
 var ignore_notify_log: Dictionary # ignore notify log
@@ -10,12 +10,12 @@ var _entity_id: int
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
 var _command_pool: Dictionary
-var _event_pool: ecs_event_center = ecs_event_center.new()
+var _event_pool: ECSEventCenter = ECSEventCenter.new()
 
 var _type_component_dict: Dictionary
 var _entity_component_dict: Dictionary
 	
-func _init(name: String = "ecs_world"):
+func _init(name: String = "ECSWorld"):
 	_name = name
 	
 func name() -> String:
@@ -26,9 +26,9 @@ func clear():
 	remove_all_commands()
 	remove_all_entities()
 	
-func create_entity() -> ecs_entity:
+func create_entity() -> ECSEntity:
 	_entity_id += 1
-	var e = ecs_entity.new(_entity_id, self)
+	var e = ECSEntity.new(_entity_id, self)
 	_entity_pool[_entity_id] = e
 	_entity_component_dict[_entity_id] = {}
 	if debug_print:
@@ -48,7 +48,7 @@ func remove_all_entities() -> bool:
 		remove_entity(entity_id)
 	return true
 	
-func get_entity(id: int) -> ecs_entity:
+func get_entity(id: int) -> ECSEntity:
 	if has_entity(id):
 		return _entity_pool[id]
 	return null
@@ -59,7 +59,7 @@ func get_entity_keys() -> Array:
 func has_entity(id: int) -> bool:
 	return _entity_pool.has(id)
 	
-func add_component(entity_id: int, name: String, component = ecs_component.new()) -> bool:
+func add_component(entity_id: int, name: String, component = ECSComponent.new()) -> bool:
 	if not _add_entity_component(entity_id, name, component):
 		return false
 	component._name = name
@@ -68,7 +68,7 @@ func add_component(entity_id: int, name: String, component = ecs_component.new()
 	if debug_print:
 		print("component <%s:%s> add to entity <%d>." % [_name, name, entity_id])
 	# 实体组件添加信号
-	var entity: ecs_entity = component._entity
+	var entity: ECSEntity = component._entity
 	entity.on_component_added.emit(entity, component)
 	return true
 	
@@ -79,7 +79,7 @@ func remove_component(entity_id: int, name: String) -> bool:
 	if debug_print:
 		print("component <%s:%s> remove from entity <%d>." % [_name, name, entity_id])
 	# 实体组件移除信号
-	var entity: ecs_entity = c._entity
+	var entity: ECSEntity = c._entity
 	entity.on_component_removed.emit(entity, c)
 	return true
 	
@@ -118,7 +118,7 @@ func view(name: String) -> Array:
 	
 func multi_view(names: Array[String], filter: Callable = Callable()) -> Array:
 	var result = []
-	for c in view(names.front()) as Array[ecs_component]:
+	for c in view(names.front()) as Array[ECSComponent]:
 		var e = c.entity()
 		if _is_satisfy_components(e, names):
 			var dict = _get_satisfy_components(e, names)
@@ -215,14 +215,14 @@ class _command_shell extends RefCounted:
 	func _init(r: Resource, debug_print: bool = false):
 		_class = r
 		_debug_print = debug_print
-	func _register(w: ecs_world, name: String):
+	func _register(w: ECSWorld, name: String):
 		_w_name = w.name()
 		_world = weakref(w)
 		w.add_callable(name, _on_event)
-	func _unregister(w: ecs_world, name: String):
+	func _unregister(w: ECSWorld, name: String):
 		w.remove_callable(name, _on_event)
 		_world = null
-	func _on_event(e: ecs_event):
+	func _on_event(e: ECSEvent):
 		if _debug_print:
 			print("command <%s:%s> execute." % [_w_name, e.name])
 		var cmd = _class.new()
@@ -238,7 +238,7 @@ func add_command(name: String, cmdres: Resource) -> bool:
 	_command_pool[name] = shell
 	shell._register(self, name)
 	if debug_print:
-		print("command <%s:%s> add to ecs_world." % [_name, name])
+		print("command <%s:%s> add to ECSWorld." % [_name, name])
 	return true
 	
 func remove_command(name: String) -> bool:
@@ -246,7 +246,7 @@ func remove_command(name: String) -> bool:
 		var shell = _command_pool[name]
 		shell._unregister(self, name)
 		if debug_print:
-			print("command <%s:%s> remove from ecs_world." % [_name, name])
+			print("command <%s:%s> remove from ECSWorld." % [_name, name])
 	return _command_pool.erase(name)
 	
 func remove_all_commands() -> bool:
@@ -268,7 +268,7 @@ func notify(event_name: String, value = null):
 		print('notify <%s> "%s", %s.' % [_name, event_name, value])
 	_event_pool.notify(event_name, value)
 	
-func send(e: ecs_event):
+func send(e: ECSEvent):
 	if debug_print and not ignore_notify_log.has(e.name):
 		print('send <%s> "%s", %s.' % [_name, e.name, e.data])
 	_event_pool.send(e)
@@ -278,19 +278,19 @@ func _get_type_list(name: String) -> Dictionary:
 		_type_component_dict[name] = {}
 	return _type_component_dict[name]
 	
-func _is_satisfy_components(e: ecs_entity, names: Array[String]) -> bool:
+func _is_satisfy_components(e: ECSEntity, names: Array[String]) -> bool:
 	for key in names:
 		if not has_component(e.id(), key):
 			return false
 	return true
 	
-func _get_satisfy_components(e: ecs_entity, names: Array[String]) -> Dictionary:
+func _get_satisfy_components(e: ECSEntity, names: Array[String]) -> Dictionary:
 	var result = {}
 	for key in names:
 		result[key] = get_component(e.id(), key)
 	return result
 	
-func _add_entity_component(entity_id: int, name: String, component: ecs_component) -> bool:
+func _add_entity_component(entity_id: int, name: String, component: ECSComponent) -> bool:
 	if not has_entity(entity_id):
 		return false
 	var entity_dict: Dictionary = _entity_component_dict[entity_id]

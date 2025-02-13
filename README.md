@@ -1,5 +1,5 @@
 # godot-ecs
-Lightweight ecs framework wirtten with gdscript.
+Lightweight ecs framework written with gdscript.
 
 ![](ecs.png)
 
@@ -14,26 +14,26 @@ Lightweight ecs framework wirtten with gdscript.
 - Copy the 'ecs' directory to any location within your Godot project.
 - Begin your ECS coding journey with the following code:
 
-```
+```gdscript
 
 # create ecs world
-var world = ecs_world.new()
+var world = ECSWorld.new()
 
 # create entity
 var e = world.create_entity()
 
 # add component
-e.add_component("c1", ecs_component.new())
-e.add_component("c2", ecs_component.new())
-e.add_component("c3", ecs_component.new())
+e.add_component("c1", ECSComponent.new())
+e.add_component("c2", ECSComponent.new())
+e.add_component("c3", ECSComponent.new())
 
 # add system
-world.add_system("s1", ecs_system.new())
-world.add_system("s2", ecs_system.new())
-world.add_system("s3", ecs_system.new())
+world.add_system("s1", ECSSystem.new())
+world.add_system("s2", ECSSystem.new())
+world.add_system("s3", ECSSystem.new())
 
 # add command
-world.add_command("my_command", ecs_command)
+world.add_command("my_command", ECSCommand)
 
 # send notification
 world.notify("my_notification", with_param)
@@ -57,7 +57,7 @@ for dict in world.multi_view(["c1", "c2", "c3"])
 # serialize components
 var serialize_dict = {}
 for c in component_list:
-	var e: ecs_entity = c.entity()
+	var e: ECSEntity = c.entity()
 	var all_components = e.get_components()
 	var entity_data = {}
 	for cc in all_components:
