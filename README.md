@@ -14,7 +14,7 @@ Lightweight ecs framework written with gdscript.
 - Copy the 'ecs' directory to any location within your Godot project.
 - Begin your ECS coding journey with the following code:
 
-```
+```gdscript
 
 # create ecs world
 var world = ECSWorld.new()
