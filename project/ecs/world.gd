@@ -111,10 +111,16 @@ func has_component(entity_id: int, name: String) -> bool:
 	var entity_dict = _entity_component_dict[entity_id]
 	return entity_dict.has(name)
 	
-func view(name: String) -> Array:
+func view(name: String, filter: Callable = Callable()) -> Array:
 	if not _type_component_dict.has(name):
 		return []
-	return _type_component_dict[name].values()
+	if not filter.is_valid():
+		return _type_component_dict[name].values()
+	var ret: Array
+	for c in _type_component_dict[name].values():
+		if filter.call(c):
+			ret.append(c)
+	return ret
 	
 func multi_view(names: Array[String], filter: Callable = Callable()) -> Array:
 	var result = []

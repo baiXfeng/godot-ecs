@@ -104,6 +104,11 @@ func mixed_test():
 	print("mixed test component list:")
 	for c in list:
 		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
+	
+	list = _world.view("c1", func(c):
+		return false)
+	printt("view component list with filter:", list)
+	
 	printt("mixed test system list:", _world.get_system_keys())
 	printt("multi view list:", _world.multi_view(["c1", "c2"]))
 	printt("multi view list whit filter:", _world.multi_view(["c1", "c2"], func(dict: Dictionary):
