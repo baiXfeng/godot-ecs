@@ -13,7 +13,7 @@ var data:
 	get:
 		return _data
 	
-var event_center: ecs_event_center:
+var event_center: ECSEventCenter:
 	set(v):
 		pass
 	get:
