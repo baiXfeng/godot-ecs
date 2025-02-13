@@ -116,12 +116,17 @@ func view(name: String) -> Array:
 		return []
 	return _type_component_dict[name].values()
 	
-func multi_view(names: Array[String]) -> Array:
+func multi_view(names: Array[String], filter: Callable = Callable()) -> Array:
 	var result = []
 	for c in view(names.front()) as Array[ecs_component]:
 		var e = c.entity()
 		if _is_satisfy_components(e, names):
-			result.append(_get_satisfy_components(e, names))
+			var dict = _get_satisfy_components(e, names)
+			if filter.is_valid():
+				if filter.call(dict):
+					result.append(dict)
+			else:
+				result.append(dict)
 	return result
 	
 var _group_entity_dict: Dictionary

@@ -13,6 +13,7 @@ func notify(name: String, value):
 	send( ecs_event.new(name, value) )
 	
 func send(e: ecs_event):
+	e._event_center = weakref(self)
 	_get_event_listener(e.name).receive(e)
 	
 func clear():
