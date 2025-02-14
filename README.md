@@ -40,18 +40,21 @@ world.notify("my_notification", with_param)
 world.notify("my_command", with_param)
 
 # view components
-var component_list = world.view("c1")
-for c in component_list:
-	# get component from entity
-	var entity = c.entity()
-	var c1 = entity.get_component("c1")
-	var c2 = entity.get_component("c2")
-	var c3 = entity.get_component("c3")
-	# get entity's all components
-	var all_components = entity.get_components()
+for c in world.view("c1"):
+	print(c)
 
 # multi view components
 for dict in world.multi_view(["c1", "c2", "c3"])
+	print(dict)
+
+# view components with filter
+for c in world.view("c1", func(c):
+	return true):
+	print(c)
+
+# multi view components with filter
+for dict in world.multi_view(["c1", "c2"], func(dict: Dictionary):
+	return true):
 	print(dict)
 	
 # serialize components
