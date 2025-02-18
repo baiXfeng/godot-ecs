@@ -10,8 +10,8 @@ func name() -> String:
 func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func view(name: String) -> Array:
-	return world().view(name)
+func view(name: String, filter: Callable = Callable()) -> Array:
+	return world().view(name, filter)
 	
 func multi_view(names: Array[String], filter: Callable = Callable()) -> Array:
 	return world().multi_view(names, filter)

@@ -38,6 +38,8 @@ func create_entity() -> ECSEntity:
 func remove_entity(entity_id: int) -> bool:
 	if not remove_all_components(entity_id):
 		return false
+	for group_name in entity_get_groups(entity_id):
+		entity_remove_from_group(entity_id, group_name)
 	if debug_print:
 		print("entity <%s:%d> destroyed." % [_name, entity_id])
 	_entity_component_dict.erase(entity_id)
