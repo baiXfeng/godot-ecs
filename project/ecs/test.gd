@@ -9,6 +9,7 @@ func _init():
 	test_entity()
 	test_component()
 	test_system()
+	test_system_node()
 	test_remove_component()
 	test_remove_entity()
 	test_remove_system()
@@ -51,6 +52,22 @@ func test_system():
 	_world.add_system("s2", ECSSystem.new())
 	_world.add_system("s2", ECSSystem.new())
 	_world.add_system("s3", ECSSystem.new())
+	print("")
+	
+func test_system_node():
+	print("begin ECSSystemNode test")
+	var system_node = ECSSystemNode.new()
+	_world.add_system("s_node", system_node)
+	printt("system list:", _world.get_system_keys())
+	system_node.get_remote_sender_id()
+	system_node.get_rpc_unique_id()
+	system_node.is_server()
+	system_node.is_peer_connected()
+	system_node.peer()
+	system_node.set_peer(null)
+	_world.remove_system("s_node")
+	printt("system list:", _world.get_system_keys())
+	print("end ECSSystemNode test")
 	print("")
 	
 func test_remove_component():
