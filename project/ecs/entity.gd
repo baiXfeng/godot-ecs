@@ -3,13 +3,15 @@ class_name ECSEntity
 
 var _id: int
 var _world: WeakRef
+var _owner: Object
 
 signal on_component_added(entity, component)
 signal on_component_removed(entity, component)
 
-func _init(id: int, world):
+func _init(id: int, world, owner: Object = null):
 	_id = id
 	_world = weakref(world)
+	_owner = owner
 	
 func destroy():
 	if _id != 0:
@@ -21,6 +23,9 @@ func id() -> int:
 	
 func world() -> ECSWorld:
 	return _world.get_ref()
+	
+func owner() -> Object:
+	return _owner
 	
 func valid() -> bool:
 	return _id >= 1 and world().has_entity(_id)

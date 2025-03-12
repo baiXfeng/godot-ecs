@@ -26,9 +26,9 @@ func clear():
 	remove_all_commands()
 	remove_all_entities()
 	
-func create_entity() -> ECSEntity:
+func create_entity(owner: Object = null) -> ECSEntity:
 	_entity_id += 1
-	var e = ECSEntity.new(_entity_id, self)
+	var e = ECSEntity.new(_entity_id, self, owner)
 	_entity_pool[_entity_id] = e
 	_entity_component_dict[_entity_id] = {}
 	if debug_print:
