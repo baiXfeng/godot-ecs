@@ -4,14 +4,14 @@ class_name ECSEntity
 var _id: int
 var _world: WeakRef
 
-signal on_component_added(entity, component)
-signal on_component_removed(entity, component)
+signal on_component_added(entity: ECSEntity, component: ECSComponent)
+signal on_component_removed(entity: ECSEntity, component: ECSComponent)
 
-func _init(id: int, world):
+func _init(id: int, world: ECSWorld) -> void:
 	_id = id
 	_world = weakref(world)
 	
-func destroy():
+func destroy() -> void:
 	if _id != 0:
 		world().remove_entity(_id)
 		_id = 0
@@ -25,17 +25,17 @@ func world() -> ECSWorld:
 func valid() -> bool:
 	return _id >= 1 and world().has_entity(_id)
 	
-func notify(event_name: String, value = null):
+func notify(event_name: String, value = null) -> void:
 	if _id == 0:
 		return
 	world().notify(event_name, value)
 	
-func send(e: ECSEvent):
+func send(e: ECSEvent) -> void:
 	if _id == 0:
 		return
 	world().send(e)
 	
-func add_component(name: String, component = ECSComponent.new()) -> bool:
+func add_component(name: String, component := ECSComponent.new()) -> bool:
 	return world().add_component(_id, name, component)
 	
 func remove_component(name: String) -> bool:
@@ -44,10 +44,10 @@ func remove_component(name: String) -> bool:
 func remove_all_components() -> bool:
 	return world().remove_all_components(_id)
 	
-func get_component(name: String):
+func get_component(name: String) -> ECSComponent:
 	return world().get_component(_id, name)
 	
-func get_components() -> Array:
+func get_components() -> Array[ECSComponent]:
 	return world().get_components(_id)
 	
 func has_component(name: String) -> bool:
@@ -59,7 +59,7 @@ func add_to_group(group_name: String) -> bool:
 func remove_from_group(group_name: String) -> bool:
 	return world().entity_remove_from_group(_id, group_name)
 	
-func get_groups() -> Array:
+func get_groups() -> Array[String]:
 	return world().entity_get_groups(_id)
 	
 func _to_string() -> String:

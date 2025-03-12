@@ -10,49 +10,49 @@ func name() -> String:
 func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func view(name: String, filter: Callable = Callable()) -> Array:
+func view(name: String, filter := Callable()) -> Array[ECSComponent]:
 	return world().view(name, filter)
 	
-func multi_view(names: Array[String], filter: Callable = Callable()) -> Array:
+func multi_view(names: Array[String], filter := Callable()) -> Array[Dictionary]:
 	return world().multi_view(names, filter)
 	
-func group(name: String) -> Array:
+func group(name: String) -> Array[ECSEntity]:
 	return world().group(name)
 	
-func on_enter(w: ECSWorld):
+func on_enter(w: ECSWorld) -> void:
 	if w.debug_print:
 		print("system <%s:%s> on_enter." % [world().name(), _name])
 	_on_enter(w)
 	
-func on_exit(w: ECSWorld):
+func on_exit(w: ECSWorld) -> void:
 	if w.debug_print:
 		print("system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
 	
-func notify(event_name: String, value = null):
+func notify(event_name: String, value = null) -> void:
 	world().notify(event_name, value)
 	
-func send(e: ECSEvent):
+func send(e: ECSEvent) -> void:
 	world().send(e)
 	
 # ==============================================================================
 # override function
 	
 # override
-func _on_enter(w: ECSWorld):
+func _on_enter(w: ECSWorld) -> void:
 	pass
 	
 # override
-func _on_exit(w: ECSWorld):
+func _on_exit(w: ECSWorld) -> void:
 	pass
 	
 # ==============================================================================
 # private function
 	
-func _set_name(n: String):
+func _set_name(n: String) -> void:
 	_name = n
 	
-func _set_world(w: ECSWorld):
+func _set_world(w: ECSWorld) -> void:
 	_world = weakref(w)
 	
 func _to_string() -> String:

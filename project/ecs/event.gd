@@ -25,10 +25,10 @@ var _name: String
 var _data
 var _event_center: WeakRef
 	
-func _init(n, d):
+func _init(n: String, d) -> void:
 	_name = n
 	_data = d
 	
-func _to_string():
+func _to_string() -> String:
 	return "ECSEvent(\"%s\", %s)" % [_name, _data]
 	
