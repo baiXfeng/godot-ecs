@@ -1,7 +1,7 @@
 extends RefCounted
 class_name ECSEventCenter
 	
-var _event_dict: Dictionary
+var _event_dict: Dictionary[String, _listener]
 	
 func add_callable(name: String, c: Callable) -> bool:
 	return _get_event_listener(name).add(c)
@@ -9,14 +9,14 @@ func add_callable(name: String, c: Callable) -> bool:
 func remove_callable(name: String, c: Callable) -> bool:
 	return _get_event_listener(name).remove(c)
 	
-func notify(name: String, value):
+func notify(name: String, value) -> void:
 	send( ECSEvent.new(name, value) )
 	
-func send(e: ECSEvent):
+func send(e: ECSEvent) -> void:
 	e._event_center = weakref(self)
 	_get_event_listener(e.name).receive(e)
 	
-func clear():
+func clear() -> void:
 	_event_dict.clear()
 	
 func _get_event_listener(name: String) -> _listener:
@@ -37,6 +37,6 @@ class _listener extends RefCounted:
 			return false
 		_impl.disconnect(c)
 		return true
-	func receive(e: ECSEvent):
+	func receive(e: ECSEvent) -> void:
 		_impl.emit(e)
 	

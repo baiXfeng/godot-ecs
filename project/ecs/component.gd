@@ -14,23 +14,23 @@ func entity() -> ECSEntity:
 func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func _set_world(world: ECSWorld):
+func _set_world(world: ECSWorld) -> void:
 	_world = weakref(world)
 	
 func _to_string() -> String:
 	return "component:%s" % _name
 	
-func save(dict: Dictionary):
+func save(dict: Dictionary[StringName, Variant]) -> void:
 	_on_save(dict)
 	
-func load(dict: Dictionary):
+func load(dict: Dictionary[StringName, Variant]) -> void:
 	_on_load(dict)
 	
 # override
-func _on_save(dict: Dictionary):
+func _on_save(dict: Dictionary[StringName, Variant]) -> void:
 	pass
 	
 # override
-func _on_load(dict: Dictionary):
+func _on_load(dict: Dictionary[StringName, Variant]) -> void:
 	pass
 	

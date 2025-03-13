@@ -17,10 +17,10 @@ Lightweight ecs framework written with gdscript.
 ```gdscript
 
 # create ecs world
-var world = ECSWorld.new()
+var world := ECSWorld.new()
 
 # create entity
-var e = world.create_entity()
+var e: ECSEntity = world.create_entity()
 
 # add component
 e.add_component("c1", ECSComponent.new())
@@ -40,34 +40,34 @@ world.notify("my_notification", with_param)
 world.notify("my_command", with_param)
 
 # view components
-for c in world.view("c1"):
+for c: ECSComponent in world.view("c1"):
 	print(c)
 
 # multi view components
-for dict in world.multi_view(["c1", "c2", "c3"])
+for dict: Dictionary[String, ECSComponent] in world.multi_view(["c1", "c2", "c3"])
 	print(dict)
 
 # view components with filter
-for c in world.view("c1", func(c):
+for c: ECSComponent in world.view("c1", func(c: ECSComponent) -> bool:
 	return true):
 	print(c)
 
 # multi view components with filter
-for dict in world.multi_view(["c1", "c2"], func(dict: Dictionary):
+for dict: Dictionary[String, ECSComponent] in world.multi_view(["c1", "c2"], func(dict: Dictionary[String, ECSComponent]) -> bool:
 	return true):
 	print(dict)
 	
 # serialize components
-var serialize_dict = {}
-for c in component_list:
+var serialize_dict := {} as Dictionary[int, Dictionary]
+for c: ECSComponent in component_list:
 	var e: ECSEntity = c.entity()
-	var all_components = e.get_components()
-	var entity_data = {}
-	for cc in all_components:
-		var data = {}
+	var all_components: Array[ECSComponent] = e.get_components()
+	var entity_data := {} as Dictionary[String, Dictionary]
+	for cc: ECSComponent in all_components:
+		var data := {} as Dictionary[StringName, Variant]
 		cc.save( data )
 		entity_data[ cc.name() ] = data
-	var entity_id = e.id()
+	var entity_id: int = e.id()
 	serialize_dict[ entity_id ] = entity_data
 
 printt("this is entity serialize data", serialize_dict)

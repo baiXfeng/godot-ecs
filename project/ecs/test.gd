@@ -1,10 +1,10 @@
 extends RefCounted
 class_name ECSTest
 
-var _world: ECSWorld = ECSWorld.new("ECSWorld_test")
+var _world := ECSWorld.new("ECSWorld_test")
 var _entity: ECSEntity
 
-func _init():
+func _init() -> void:
 	_world.debug_print = true
 	test_entity()
 	test_component()
@@ -19,27 +19,27 @@ func _init():
 	test_command()
 	test_entity_add_to_group()
 	
-func queue_free():
+func queue_free() -> void:
 	_entity = null
 	_world.clear()
 	
-func test_entity():
+func test_entity() -> void:
 	_entity = _world.create_entity()
 	_entity.add_to_group("first_entity")
 	_entity.add_to_group("test_group")
 	
-	var e = _world.get_entity(_entity.id())
+	var e: ECSEntity = _world.get_entity(_entity.id())
 	printt("entity id is equality:", e.id() == _entity.id())
 	
-	var first_entity_group = _world.group("first_entity")
+	var first_entity_group: Array[ECSEntity] = _world.group("first_entity")
 	printt("first entity group:", first_entity_group.size(), first_entity_group.front().id())
 	
-	var test_entity_group = _world.group("test_group")
+	var test_entity_group: Array[ECSEntity] = _world.group("test_group")
 	printt("test entity group:", test_entity_group.size(), test_entity_group.front().id())
 	
 	print("")
 	
-func test_component():
+func test_component() -> void:
 	_entity.add_component("c1", ECSComponent.new())
 	_entity.add_component("c2", ECSComponent.new())
 	_entity.add_component("c3", ECSComponent.new())
@@ -47,66 +47,66 @@ func test_component():
 	_entity.add_component("c5", ECSViewComponent.new(null))
 	print("")
 	
-func test_system():
+func test_system() -> void:
 	_world.add_system("s1", ECSSystem.new())
 	_world.add_system("s2", ECSSystem.new())
 	_world.add_system("s2", ECSSystem.new())
 	_world.add_system("s3", ECSSystem.new())
 	print("")
 	
-func test_system_node():
+func test_system_node() -> void:
 	print("begin ECSSystemNode test")
-	var system_node = ECSSystemNode.new()
-	_world.add_system("s_node", system_node)
-	printt("system list:", _world.get_system_keys())
+	var system_node := ECSSystemNode.new()
+	_world.add_system_node("s_node", system_node)
+	printt("system node list:", _world.get_system_node_keys())
 	system_node.get_remote_sender_id()
 	system_node.get_rpc_unique_id()
 	system_node.is_server()
 	system_node.is_peer_connected()
 	system_node.peer()
 	system_node.set_peer(null)
-	_world.remove_system("s_node")
-	printt("system list:", _world.get_system_keys())
+	_world.remove_system_node("s_node")
+	printt("system node list:", _world.get_system_node_keys())
 	print("end ECSSystemNode test")
 	print("")
 	
-func test_remove_component():
+func test_remove_component() -> void:
 	_entity.remove_component("c1")
 	_entity.remove_component("c3")
 	
-	var list = _entity.get_components()
+	var list: Array[ECSComponent] = _entity.get_components()
 	print("entity component list:")
-	for c in list:
+	for c: ECSComponent in list:
 		print("component [%s]" % c)
 	print("")
 	
-func test_remove_entity():
+func test_remove_entity() -> void:
 	_entity.destroy()
 	
-	var list = _world.get_entity_keys()
-	print("entity list:")
-	if list.is_empty():
-		print("entity list is empty.")
+	var entity_id_list: Array[int] = _world.get_entity_keys()
+	print("entity id list:")
+	if entity_id_list.is_empty():
+		print("entity id list is empty.")
 	else:
-		for key in list:
-			print("entity [%d]" % key)
-	list = _world.view("c2")
+		for entity_id: int in entity_id_list:
+			print("entity id [%d]" % entity_id)
+	var component_list: Array[ECSComponent] = _world.view("c2")
 	print("component list:")
-	if list.is_empty():
+	if component_list.is_empty():
 		print("component list is empty.")
 	else:
-		for c in list:
+		for c: ECSComponent in component_list:
 			print("component [%s]" % c)
 	print("")
 	
-func test_remove_system():
+func test_remove_system() -> void:
 	_world.remove_system("s1")
 	_world.remove_system("s3")
 	printt("system list:", _world.get_system_keys())
 	print("")
 	
-func mixed_test():
-	var e = _world.create_entity()
+func mixed_test() -> void:
+	var e: ECSEntity = _world.create_entity()
 	e.add_component("c1", ECSComponent.new())
 	e.add_component("c2", ECSComponent.new())
 	e.add_component("c3", ECSComponent.new())
@@ -117,32 +117,32 @@ func mixed_test():
 	_entity.add_component("c3", ECSComponent.new())
 	_world.add_system("s1", ECSSystem.new())
 	
-	var list = _world.view("c1")
+	var component_list: Array[ECSComponent] = _world.view("c1")
 	print("mixed test component list:")
-	for c in list:
+	for c: ECSComponent in component_list:
 		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
 	
-	list = _world.view("c1", func(c):
+	component_list = _world.view("c1", func(c: ECSComponent) -> bool:
 		return false)
-	printt("view component list with filter:", list)
+	printt("view component list with filter:", component_list)
 	
 	printt("mixed test system list:", _world.get_system_keys())
 	printt("multi view list:", _world.multi_view(["c1", "c2"]))
-	printt("multi view list whit filter:", _world.multi_view(["c1", "c2"], func(dict: Dictionary):
+	printt("multi view list with filter:", _world.multi_view(["c1", "c2"], func(dict: Dictionary[String, ECSComponent]) -> bool:
 		return false))
 	
-func test_snapshot():
-	var list = _world.view("c1")
-	var data = {}
-	for c in list:
+func test_snapshot() -> void:
+	var component_list: Array[ECSComponent] = _world.view("c1")
+	var data := {} as Dictionary[int, Dictionary]
+	for c: ECSComponent in component_list:
 		var e: ECSEntity = c.entity()
-		var comps = e.get_components()
-		var entity_data = {}
+		var comps: Array[ECSComponent] = e.get_components()
+		var entity_data := {} as Dictionary[String, Dictionary]
 		printt("\nstart save entity [%d] ..." % e.id())
-		for cc in comps:
-			var save_data = {}
+		for cc: ECSComponent in comps:
+			var save_data := {} as Dictionary[StringName, Variant]
 			cc.save(save_data)
-			var name = cc.name()
+			var name: String = cc.name()
 			entity_data[ name ] = save_data
 			printt("save component:", save_data)
 		data[ e.id() ] = entity_data
@@ -154,23 +154,23 @@ func test_snapshot():
 	print("")
 	
 class event_tester extends ECSSystem:
-	func _on_enter(w: ECSWorld):
+	func _on_enter(w: ECSWorld) -> void:
 		w.add_callable("test", _on_event)
 		pass
-	func _on_exit(w: ECSWorld):
+	func _on_exit(w: ECSWorld) -> void:
 		w.remove_callable("test", _on_event)
-	func _on_event(e: ECSEvent):
+	func _on_event(e: ECSEvent) -> void:
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
 class callable_event_tester extends  ECSSystem:
-	func _on_enter(w: ECSWorld):
+	func _on_enter(w: ECSWorld) -> void:
 		w.add_callable("test", _on_event)
-	func _on_exit(w: ECSWorld):
+	func _on_exit(w: ECSWorld) -> void:
 		w.remove_callable("test", _on_event)
-	func _on_event(e: ECSEvent):
+	func _on_event(e: ECSEvent) -> void:
 		printt("system [%s] on event [%s] with param [%s]" % [self.name(), e.name, e.data])
 	
-func test_event():
+func test_event() -> void:
 	print("begin test add_listener for event:")
 	_world.add_system("test_event_system", event_tester.new())
 	_world.notify("test", "hello test event.")
@@ -186,12 +186,12 @@ func test_event():
 	print("")
 	
 class _cmd extends ECSCommand:
-	func _init():
+	func _init() -> void:
 		print("test command init.")
-	func _on_execute(e: ECSEvent):
+	func _on_execute(e: ECSEvent) -> void:
 		print("test command execute.")
 	
-func test_command():
+func test_command() -> void:
 	_world.add_command("test_cmd_1", _cmd)
 	_world.add_command("test_cmd_2", _cmd)
 	
@@ -205,14 +205,14 @@ func test_command():
 	printt("has command", _world.has_command("test_cmd_1"))
 	print("")
 	
-func test_entity_add_to_group():
-	var e = _world.create_entity()
+func test_entity_add_to_group() -> void:
+	var e: ECSEntity = _world.create_entity()
 	e.add_to_group("battle")
 	e.add_to_group("attack")
 	printt("entity group list:", e.get_groups())
 	e.remove_from_group("battle")
 	printt("entity group list:", e.get_groups())
-	var list = _world.fetch_entities("battle")
-	printt("battle entity size:", list.size())
+	var battle_entity_list: Array[ECSEntity] = _world.fetch_entities("battle")
+	printt("battle entity size:", battle_entity_list.size())
 	
 	

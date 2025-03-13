@@ -1,14 +1,14 @@
 extends RefCounted
 class_name ECSCommand
 
-var _cmd_list: Array
+var _cmd_list: Array[ECSCommand]
 var _world: WeakRef
 
-func add_command(cmd):
+func add_command(cmd: ECSCommand) -> void:
 	_cmd_list.append(cmd)
 	
-func execute(e: ECSEvent):
-	for cmd in _cmd_list:
+func execute(e: ECSEvent) -> void:
+	for cmd: ECSCommand in _cmd_list:
 		cmd._set_world(world())
 		cmd.execute(e)
 	_on_execute(e)
@@ -16,20 +16,20 @@ func execute(e: ECSEvent):
 func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func view(name: String) -> Array:
+func view(name: String) -> Array[ECSComponent]:
 	return world().view(name)
 	
-func multi_view(names: Array[String]) -> Array:
+func multi_view(names: Array[String]) -> Array[Dictionary]:
 	return world().multi_view(names)
 	
-func group(name: String) -> Array:
+func group(name: String) -> Array[ECSEntity]:
 	return world().group(name)
 	
 # ==============================================================================
 # override
-func _on_execute(e: ECSEvent):
+func _on_execute(e: ECSEvent) -> void:
 	pass
 	
-func _set_world(w: ECSWorld):
+func _set_world(w: ECSWorld) -> void:
 	_world = weakref(w)
 	
