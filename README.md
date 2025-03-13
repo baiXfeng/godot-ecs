@@ -1,7 +1,7 @@
 # godot-ecs
 Lightweight ecs framework written with gdscript.
 
-![](ecs.png)
+![](images/ecs.png)
 
 # Features
 
