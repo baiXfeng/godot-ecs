@@ -1,8 +1,8 @@
 extends ECSComponent
 class_name ECSViewComponent
 
-var view: Node
+var view
 
-func _init(v: Node = null) -> void:
+func _init(v = null) -> void:
 	view = v
 	
