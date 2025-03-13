@@ -20,17 +20,17 @@ func _set_world(world: ECSWorld) -> void:
 func _to_string() -> String:
 	return "component:%s" % _name
 	
-func save(dict: Dictionary[StringName, Variant]) -> void:
+func save(dict: Dictionary) -> void:
 	_on_save(dict)
 	
-func load(dict: Dictionary[StringName, Variant]) -> void:
+func load(dict: Dictionary) -> void:
 	_on_load(dict)
 	
 # override
-func _on_save(dict: Dictionary[StringName, Variant]) -> void:
+func _on_save(dict: Dictionary) -> void:
 	pass
 	
 # override
-func _on_load(dict: Dictionary[StringName, Variant]) -> void:
+func _on_load(dict: Dictionary) -> void:
 	pass
 	

@@ -1,7 +1,7 @@
 extends RefCounted
 class_name ECSEventCenter
 	
-var _event_dict: Dictionary[String, _listener]
+var _event_dict: Dictionary
 	
 func add_callable(name: String, c: Callable) -> bool:
 	return _get_event_listener(name).add(c)

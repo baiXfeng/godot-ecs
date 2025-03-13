@@ -10,13 +10,13 @@ func name() -> String:
 func world() -> ECSWorld:
 	return _world.get_ref()
 	
-func view(name: String, filter := Callable()) -> Array[ECSComponent]:
+func view(name: String, filter := Callable()) -> Array:
 	return world().view(name, filter)
 	
-func multi_view(names: Array[String], filter := Callable()) -> Array[Dictionary]:
+func multi_view(names: Array, filter := Callable()) -> Array:
 	return world().multi_view(names, filter)
 	
-func group(name: String) -> Array[ECSEntity]:
+func group(name: String) -> Array:
 	return world().group(name)
 	
 func on_enter(w: ECSWorld) -> void:
