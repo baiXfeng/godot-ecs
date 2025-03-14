@@ -31,10 +31,10 @@ func test_entity() -> void:
 	var e: ECSEntity = _world.get_entity(_entity.id())
 	printt("entity id is equality:", e.id() == _entity.id())
 	
-	var first_entity_group: Array[ECSEntity] = _world.group("first_entity")
+	var first_entity_group: Array = _world.group("first_entity")
 	printt("first entity group:", first_entity_group.size(), first_entity_group.front().id())
 	
-	var test_entity_group: Array[ECSEntity] = _world.group("test_group")
+	var test_entity_group: Array = _world.group("test_group")
 	printt("test entity group:", test_entity_group.size(), test_entity_group.front().id())
 	
 	print("")
@@ -74,7 +74,7 @@ func test_remove_component() -> void:
 	_entity.remove_component("c1")
 	_entity.remove_component("c3")
 	
-	var list: Array[ECSComponent] = _entity.get_components()
+	var list: Array = _entity.get_components()
 	print("entity component list:")
 	for c: ECSComponent in list:
 		print("component [%s]" % c)
@@ -83,14 +83,14 @@ func test_remove_component() -> void:
 func test_remove_entity() -> void:
 	_entity.destroy()
 	
-	var entity_id_list: Array[int] = _world.get_entity_keys()
+	var entity_id_list: Array = _world.get_entity_keys()
 	print("entity id list:")
 	if entity_id_list.is_empty():
 		print("entity id list is empty.")
 	else:
 		for entity_id: int in entity_id_list:
 			print("entity id [%d]" % entity_id)
-	var component_list: Array[ECSComponent] = _world.view("c2")
+	var component_list: Array = _world.view("c2")
 	print("component list:")
 	if component_list.is_empty():
 		print("component list is empty.")
@@ -117,7 +117,7 @@ func mixed_test() -> void:
 	_entity.add_component("c3", ECSComponent.new())
 	_world.add_system("s1", ECSSystem.new())
 	
-	var component_list: Array[ECSComponent] = _world.view("c1")
+	var component_list: Array = _world.view("c1")
 	print("mixed test component list:")
 	for c: ECSComponent in component_list:
 		print("component [%s] entity [%d]" % [c.name(), c.entity().id()])
@@ -128,19 +128,19 @@ func mixed_test() -> void:
 	
 	printt("mixed test system list:", _world.get_system_keys())
 	printt("multi view list:", _world.multi_view(["c1", "c2"]))
-	printt("multi view list with filter:", _world.multi_view(["c1", "c2"], func(dict: Dictionary[String, ECSComponent]) -> bool:
+	printt("multi view list with filter:", _world.multi_view(["c1", "c2"], func(dict: Dictionary) -> bool:
 		return false))
 	
 func test_snapshot() -> void:
-	var component_list: Array[ECSComponent] = _world.view("c1")
-	var data := {} as Dictionary[int, Dictionary]
+	var component_list: Array = _world.view("c1")
+	var data := {}
 	for c: ECSComponent in component_list:
 		var e: ECSEntity = c.entity()
-		var comps: Array[ECSComponent] = e.get_components()
-		var entity_data := {} as Dictionary[String, Dictionary]
+		var comps: Array = e.get_components()
+		var entity_data := {}
 		printt("\nstart save entity [%d] ..." % e.id())
 		for cc: ECSComponent in comps:
-			var save_data := {} as Dictionary[StringName, Variant]
+			var save_data := {}
 			cc.save(save_data)
 			var name: String = cc.name()
 			entity_data[ name ] = save_data
@@ -212,7 +212,7 @@ func test_entity_add_to_group() -> void:
 	printt("entity group list:", e.get_groups())
 	e.remove_from_group("battle")
 	printt("entity group list:", e.get_groups())
-	var battle_entity_list: Array[ECSEntity] = _world.fetch_entities("battle")
+	var battle_entity_list: Array = _world.fetch_entities("battle")
 	printt("battle entity size:", battle_entity_list.size())
 	
 	

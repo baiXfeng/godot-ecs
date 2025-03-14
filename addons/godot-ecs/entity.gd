@@ -47,7 +47,7 @@ func remove_all_components() -> bool:
 func get_component(name: String) -> ECSComponent:
 	return world().get_component(_id, name)
 	
-func get_components() -> Array[ECSComponent]:
+func get_components() -> Array:
 	return world().get_components(_id)
 	
 func has_component(name: String) -> bool:
@@ -59,7 +59,7 @@ func add_to_group(group_name: String) -> bool:
 func remove_from_group(group_name: String) -> bool:
 	return world().entity_remove_from_group(_id, group_name)
 	
-func get_groups() -> Array[String]:
+func get_groups() -> Array:
 	return world().entity_get_groups(_id)
 	
 func _to_string() -> String:
