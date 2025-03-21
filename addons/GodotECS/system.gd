@@ -11,10 +11,14 @@ func world() -> ECSWorld:
 	return _world.get_ref()
 	
 func view(name: String, filter := Callable()) -> Array:
-	return world().view(name, filter)
+	var w := world()
+	w.on_system_viewed.emit(self.name(), [name])
+	return w.view(name, filter)
 	
 func multi_view(names: Array, filter := Callable()) -> Array:
-	return world().multi_view(names, filter)
+	var w := world()
+	w.on_system_viewed.emit(self.name(), names)
+	return w.multi_view(names, filter)
 	
 func group(name: String) -> Array:
 	return world().group(name)

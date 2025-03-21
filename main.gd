@@ -149,6 +149,7 @@ func _ready():
 	_world.debug_entity = true
 	# ignore on_process log
 	_world.ignore_notify_log["on_process"] = true
+	_world.on_system_viewed.connect(_print_system_viewed)
 	
 	# create entity
 	var e = _world.create_entity()
@@ -214,4 +215,9 @@ func _on_save_pressed() -> void:
 	
 	# save data
 	_world.notify("save_game_command")
+	
+func _print_system_viewed(system: String, components: Array):
+	if system == "my_system":
+		return
+	printt("System/Components:", system, components)
 	

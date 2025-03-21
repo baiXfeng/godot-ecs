@@ -5,6 +5,8 @@ var debug_print: bool		# ecs logging
 var debug_entity: bool		# for entity debugging
 var ignore_notify_log: Dictionary # ignore notify log
 
+signal on_system_viewed(name: String, components: Array)
+
 var _name: String
 
 var _entity_id: int
@@ -108,6 +110,9 @@ func get_components(entity_id: int) -> Array:
 		return []
 	var entity_dict: Dictionary = _entity_component_dict[entity_id]
 	return entity_dict.values()
+	
+func get_component_keys() -> Array:
+	return _type_component_dict.keys()
 	
 func has_component(entity_id: int, name: String) -> bool:
 	if not has_entity(entity_id):
@@ -250,9 +255,11 @@ func has_system_node(name: String) -> bool:
 class _command_shell extends RefCounted:
 	var _debug_print: bool
 	var _class: GDScript
-	var _w_name: String
+	var _c_name: StringName
+	var _w_name: StringName
 	var _world: WeakRef
-	func _init(script: GDScript, debug_print := false) -> void:
+	func _init(name: StringName, script: GDScript, debug_print := false) -> void:
+		_c_name = name
 		_class = script
 		_debug_print = debug_print
 	func _register(w: ECSWorld, name: String) -> void:
@@ -267,6 +274,7 @@ class _command_shell extends RefCounted:
 			print("command <%s:%s> execute." % [_w_name, e.name])
 		var cmd: ECSCommand = _class.new()
 		cmd._set_world(_world.get_ref())
+		cmd._set_name(_c_name)
 		cmd.execute(e)
 	
 func add_command(name: String, cmd_script: GDScript) -> bool:
@@ -274,7 +282,7 @@ func add_command(name: String, cmd_script: GDScript) -> bool:
 		print("add command <%s:%s> fail: GDScript is null." % [_name, name])
 		return false
 	remove_command(name)
-	var shell := _command_shell.new(cmd_script, debug_print)
+	var shell := _command_shell.new(name, cmd_script, debug_print)
 	_command_pool[name] = shell
 	shell._register(self, name)
 	if debug_print:
