@@ -146,6 +146,7 @@ func _ready():
 	
 	# debug print on
 	_world.debug_print = true
+	_world.debug_entity = true
 	# ignore on_process log
 	_world.ignore_notify_log["on_process"] = true
 	

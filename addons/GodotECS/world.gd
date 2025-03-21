@@ -1,7 +1,8 @@
 extends RefCounted
 class_name ECSWorld
 
-var debug_print: bool
+var debug_print: bool		# ecs logging
+var debug_entity: bool		# for entity debugging
 var ignore_notify_log: Dictionary # ignore notify log
 
 var _name: String
@@ -29,7 +30,7 @@ func clear() -> void:
 	
 func create_entity() -> ECSEntity:
 	_entity_id += 1
-	var e := ECSEntity.new(_entity_id, self)
+	var e := ECSEntity.new(_entity_id, self) if not debug_entity else DebugEntity.new(_entity_id, self)
 	_entity_pool[_entity_id] = e
 	_entity_component_dict[_entity_id] = {}
 	if debug_print:
