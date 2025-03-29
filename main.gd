@@ -163,7 +163,7 @@ func _ready():
 	game_data.on_component_added.connect(_on_game_data_component_added)
 	
 	# add system
-	_world.add_system("my_system", my_system.new())
+	_world.add_system("my_system", my_system.new(self))
 	
 	# add command, use class resource, not instance
 	_world.add_command("save_game_command", save_game_command)

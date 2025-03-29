@@ -1,4 +1,4 @@
-extends RefCounted
+extends Node
 class_name ECSSystem
 
 var _name: String
@@ -23,6 +23,24 @@ func multi_view(names: Array, filter := Callable()) -> Array:
 func group(name: String) -> Array:
 	return world().group(name)
 	
+func get_remote_sender_id() -> int:
+	return multiplayer.get_remote_sender_id()
+	
+func get_rpc_unique_id() -> int:
+	return multiplayer.get_unique_id()
+	
+func is_server() -> bool:
+	return multiplayer.is_server()
+	
+func is_peer_connected() -> bool:
+	return peer().get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
+	
+func peer() -> MultiplayerPeer:
+	return multiplayer.multiplayer_peer
+	
+func set_peer(peer: MultiplayerPeer):
+	multiplayer.multiplayer_peer = peer
+	
 func on_enter(w: ECSWorld) -> void:
 	if w.debug_print:
 		print("system <%s:%s> on_enter." % [world().name(), _name])
@@ -32,6 +50,7 @@ func on_exit(w: ECSWorld) -> void:
 	if w.debug_print:
 		print("system <%s:%s> on_exit." % [world().name(), _name])
 	_on_exit(w)
+	queue_free()
 	
 func notify(event_name: String, value = null) -> void:
 	world().notify(event_name, value)
@@ -52,6 +71,10 @@ func _on_exit(w: ECSWorld) -> void:
 	
 # ==============================================================================
 # private function
+	
+func _init(parent: Node = null):
+	if parent:
+		parent.add_child(self)
 	
 func _set_name(n: String) -> void:
 	_name = n

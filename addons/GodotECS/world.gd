@@ -9,10 +9,9 @@ signal on_system_viewed(name: String, components: Array)
 
 var _name: String
 
-var _entity_id: int
+var _entity_id: int = 0xFFFFFFFF
 var _entity_pool: Dictionary
 var _system_pool: Dictionary
-var _system_node_pool: Dictionary
 var _command_pool: Dictionary
 var _event_pool := ECSEventCenter.new()
 
@@ -30,14 +29,16 @@ func clear() -> void:
 	remove_all_commands()
 	remove_all_entities()
 	
-func create_entity() -> ECSEntity:
-	_entity_id += 1
-	var e := ECSEntity.new(_entity_id, self) if not debug_entity else DebugEntity.new(_entity_id, self)
-	_entity_pool[_entity_id] = e
-	_entity_component_dict[_entity_id] = {}
+# user valid entity id (0x1 ~ 0xFFFFFFFF)
+func create_entity(id: int = 0) -> ECSEntity:
+	assert(id >= 0 and id <= 0xFFFFFFFF, "create_entity invalid id!")
+	var eid: int = id if id >= 1 else _entity_id + 1
+	if id == 0:
+		_entity_id += 1
+	remove_entity(eid)
 	if debug_print:
-		print("entity <%s:%d> created." % [_name, _entity_id])
-	return e
+		print("entity <%s:%d> created." % [_name, eid])
+	return _create_entity(eid)
 	
 func remove_entity(entity_id: int) -> bool:
 	if not remove_all_components(entity_id):
@@ -52,6 +53,7 @@ func remove_entity(entity_id: int) -> bool:
 func remove_all_entities() -> bool:
 	for entity_id: int in _entity_pool.keys():
 		remove_entity(entity_id)
+	_entity_id = 0xFFFFFFFF
 	return true
 	
 func get_entity(id: int) -> ECSEntity:
@@ -200,34 +202,15 @@ func add_system(name: String, system: ECSSystem) -> bool:
 	system.on_enter(self)
 	return true
 	
-func add_system_node(name: String, system_node: ECSSystemNode) -> bool:
-	remove_system_node(name)
-	_system_node_pool[name] = system_node
-	system_node._set_name(name)
-	system_node._set_world(self)
-	system_node.on_enter(self)
-	return true
-	
 func remove_system(name: String) -> bool:
 	if not _system_pool.has(name):
 		return false
 	_system_pool[name].on_exit(self)
 	return _system_pool.erase(name)
 	
-func remove_system_node(name: String) -> bool:
-	if not _system_node_pool.has(name):
-		return false
-	_system_node_pool[name].on_exit(self)
-	return _system_node_pool.erase(name)
-	
 func remove_all_systems() -> bool:
 	for name: String in _system_pool.keys():
 		remove_system(name)
-	return true
-	
-func remove_all_system_nodes() -> bool:
-	for name: String in _system_node_pool.keys():
-		remove_system_node(name)
 	return true
 	
 func get_system(name: String) -> ECSSystem:
@@ -235,22 +218,11 @@ func get_system(name: String) -> ECSSystem:
 		return null
 	return _system_pool[name]
 	
-func get_system_node(name: String) -> ECSSystemNode:
-	if not _system_node_pool.has(name):
-		return null
-	return _system_node_pool[name]
-	
 func get_system_keys() -> Array:
 	return _system_pool.keys()
 	
-func get_system_node_keys() -> Array:
-	return _system_node_pool.keys()
-	
 func has_system(name: String) -> bool:
 	return _system_pool.has(name)
-	
-func has_system_node(name: String) -> bool:
-	return _system_node_pool.has(name)
 	
 class _command_shell extends RefCounted:
 	var _debug_print: bool
@@ -354,4 +326,10 @@ func _remove_entity_component(entity_id: int, name: String) -> bool:
 	type_list.erase(entity_id)
 	var entity_dict: Dictionary = _entity_component_dict[entity_id]
 	return entity_dict.erase(name)
+	
+func _create_entity(eid: int) -> ECSEntity:
+	var e := ECSEntity.new(eid, self) if not debug_entity else DebugEntity.new(eid, self)
+	_entity_pool[eid] = e
+	_entity_component_dict[eid] = {}
+	return e
 	
