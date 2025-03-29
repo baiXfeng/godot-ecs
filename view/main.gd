@@ -48,10 +48,6 @@ func _on_score_changed(value: int):
 func _on_seconds_changed(value: float):
 	_time.text = "Seconds: %.2f" % value
 	
-func _process(delta):
-	# system on process
-	_world.notify("on_process", delta)
-	
 func _on_load_pressed() -> void:
 	# load data
 	_world.notify("load_game_command")
