@@ -1,6 +1,6 @@
 extends Node2D
 
-# create ecs world
+# get global ecs world
 var _world: ECSWorld = Singleton.world
 	
 @onready var _score = $VBoxContainer/Scroe

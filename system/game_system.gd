@@ -18,8 +18,6 @@ func _on_enter(w: ECSWorld) -> void:
 	# debug print on
 	w.debug_print = true
 	w.debug_entity = true
-	# ignore on_process log
-	w.ignore_notify_log["on_process"] = true
 	
 # override
 func _on_exit(w: ECSWorld) -> void:
