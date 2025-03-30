@@ -44,19 +44,20 @@ const CLASS = preload("../Serialization/header.gd")
 func _pack_entities(dict: Dictionary) -> void:
 	var entity_data := {}
 	var class_list: Array[String]
+	var uid_list: Array[String]
 	for eid: int in _w.get_entity_keys():
 		var e := _w.get_entity(eid)
 		var entity_dict := {
 			"components": {},
 			"groups": e.get_groups(),
 		}
-		_pack_components(e, entity_dict["components"], class_list)
+		_pack_components(e, entity_dict["components"], class_list, uid_list)
 		entity_data[eid] = entity_dict
 	dict["entities"] = entity_data
-	dict["class_list"] = class_list
+	dict["class_list"] = uid_list
 	dict["last_entity_id"] = _w._entity_id
 	
-func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String]) -> void:
+func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String], uid_list: Array[String]) -> void:
 	for c: ECSComponent in e.get_components():
 		var c_dict := {}
 		var output := CLASS.OutputArchive.new(c_dict)
@@ -67,8 +68,15 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String])
 		var pos = class_list.find(res.resource_path)
 		if pos == -1:
 			class_list.append(res.resource_path)
+			uid_list.append(_get_uid(res.resource_path))
 			pos = class_list.size() - 1
 		c_dict["_class_index"] = pos
+	
+func _get_uid(path: String) -> String:
+	var f := FileAccess.open(path + ".uid", FileAccess.READ)
+	if f:
+		return f.get_as_text().strip_escapes()
+	return path
 	
 func _unpack_entities(dict: Dictionary) -> bool:
 	# verify version
