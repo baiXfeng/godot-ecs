@@ -18,7 +18,7 @@ func _on_save_game(e: ECSEvent):
 	_write_to_disk(pack.data())
 	
 	# notify game data
-	e.event_center.notify("game_saved")
+	world().notify("game_saved")
 	
 func _write_to_disk(dict: Dictionary):
 	var f := FileAccess.open("user://game.save", FileAccess.WRITE)

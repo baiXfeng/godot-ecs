@@ -20,7 +20,7 @@ func _on_load_game(e: ECSEvent):
 		packer.unpack_world(pack)
 		
 		# notify game data
-		e.event_center.notify("game_loaded")
+		world().notify("game_loaded")
 	
 func _load_json(path: String) -> Dictionary:
 	var f := FileAccess.open(path, FileAccess.READ)

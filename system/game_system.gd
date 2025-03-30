@@ -19,6 +19,10 @@ func _on_enter(w: ECSWorld) -> void:
 	w.debug_print = true
 	w.debug_entity = true
 	
+	# test component
+	var packer := ECSWorldPacker.new(w)
+	packer.test_component()
+	
 # override
 func _on_exit(w: ECSWorld) -> void:
 	# remove system

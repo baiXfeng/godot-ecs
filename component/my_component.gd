@@ -16,25 +16,37 @@ signal on_seconds_changed(value: float)
 
 # override
 func _on_save(ar: Archive) -> void:
+	# Serialization
+	# ar.version = 1
 	ar.set_var("value1", value1)
 	ar.set_var("value2", value2)
 	
 # override
 func _on_load(ar: Archive) -> void:
+	# Deserialization
 	value1 = ar.get_var("value1", 0)
 	value2 = ar.get_var("value2", 0.0)
 	
 # override
 func _on_convert(ar: Archive) -> void:
+	# Component data upgrade program for archived version compatibility
 	match ar.version:
-		1:
-			# some modify ...
-			pass
-		2:
-			# some modify ...
-			pass
+		0:	# from version 0 to version 1
+			# example
+			ar.set_var("value3", ar.get_var("value1", 0))
 	
 # override
 func _on_test() -> void:
-	pass
+	# some test
+	var ar := InOutArchive.new({})
+	ar.set_var("value1", 1)
+	ar.set_var("value2", 1.0)
+	
+	while ar.version < 1:
+		self.convert(ar)
+		ar.version += 1
+		
+		match ar.version:
+			1:
+				assert(ar.get_var("value3", 0) == 1)
 	

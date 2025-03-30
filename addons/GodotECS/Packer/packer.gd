@@ -109,10 +109,8 @@ func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 	# data upgrade
 	ar.copy_from(from)
 	while ar.version < newest_version:
-		var old_version: int = ar.version
 		c.convert(ar)
-		if old_version == ar.version:
-			ar.version += 1
+		ar.version += 1
 		
 	# load the newest data
 	c.load(ar)

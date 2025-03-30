@@ -5,6 +5,7 @@ const Serialization = preload("Serialization/header.gd")
 const Archive = Serialization.Archive
 const InputArchive = Serialization.InputArchive
 const OutputArchive = Serialization.OutputArchive
+const InOutArchive = Serialization.InOutArchive
 
 var _name: String
 var _entity: ECSEntity
