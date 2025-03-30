@@ -73,10 +73,8 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String],
 		c_dict["_class_index"] = pos
 	
 func _get_uid(path: String) -> String:
-	var f := FileAccess.open(path + ".uid", FileAccess.READ)
-	if f:
-		return f.get_as_text().strip_escapes()
-	return path
+	var uid := ResourceLoader.get_resource_uid(path)
+	return ResourceUID.id_to_text(uid)
 	
 func _unpack_entities(dict: Dictionary) -> bool:
 	# verify version
