@@ -11,6 +11,7 @@ func pack_world() -> ECSWorldPack:
 		"version": _w.VERSION,
 	}
 	var pack := ECSWorldPack.new(dict)
+	_load_uid_cache()
 	_pack_entities(dict)
 	_on_packed.call_deferred()
 	return pack
@@ -29,6 +30,7 @@ func test_component() -> void:
 # ==============================================================================
 # private
 var _w: ECSWorld
+var _uid_cache: Dictionary
 	
 func _init(w: ECSWorld) -> void:
 	_w = w
@@ -38,6 +40,20 @@ func _on_packed():
 	
 func _on_unpacked():
 	on_unpacked.emit(self)
+	
+func _load_uid_cache():
+	_uid_cache.clear()
+	
+	var f := FileAccess.open("res://.godot/uid_cache.bin", FileAccess.READ)
+	if f == null:
+		return
+	
+	var size := f.get_32()
+	for i in size:
+		var key := f.get_64()
+		var length := f.get_32()
+		var path := f.get_buffer(length).get_string_from_utf8()
+		_uid_cache[path] = ResourceUID.id_to_text(key)
 	
 const CLASS = preload("../Serialization/header.gd")
 	
@@ -73,8 +89,9 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String],
 		c_dict["_class_index"] = pos
 	
 func _get_uid(path: String) -> String:
-	var uid := ResourceLoader.get_resource_uid(path)
-	return ResourceUID.id_to_text(uid)
+	if _uid_cache.has(path):
+		return _uid_cache[path]
+	return path
 	
 func _unpack_entities(dict: Dictionary) -> bool:
 	# verify version
