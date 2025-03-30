@@ -46,8 +46,11 @@ func _pack_entities(dict: Dictionary) -> void:
 	var class_list: Array[String]
 	for eid: int in _w.get_entity_keys():
 		var e := _w.get_entity(eid)
-		var entity_dict := {}
-		_pack_components(e, entity_dict, class_list)
+		var entity_dict := {
+			"components": {},
+			"groups": e.get_groups(),
+		}
+		_pack_components(e, entity_dict["components"], class_list)
 		entity_data[eid] = entity_dict
 	dict["entities"] = entity_data
 	dict["class_list"] = class_list
@@ -84,7 +87,9 @@ func _unpack_entities(dict: Dictionary) -> bool:
 	for eid: int in dict.entities:
 		var entity_dict: Dictionary = dict.entities[eid]
 		var e = _w._create_entity(eid)
-		_unpack_components(e, entity_dict, class_list)
+		_unpack_components(e, entity_dict["components"], class_list)
+		for name: String in entity_dict["groups"]:
+			e.add_to_group(name)
 	
 	_w._entity_id = dict["last_entity_id"]
 	
