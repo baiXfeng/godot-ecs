@@ -42,10 +42,6 @@ func _init_entity():
 	e.add_component("player_unit")
 	e.add_component("my_component", MyComponent.new())
 	
-	# create game data entity
-	var game_data = world().create_entity()
-	game_data.add_component("game_data")
-	
 func _free_entity():
 	world().remove_all_entities()
 	
