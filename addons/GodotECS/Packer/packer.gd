@@ -1,0 +1,103 @@
+extends RefCounted
+class_name ECSWorldPacker
+
+func pack_world() -> ECSWorldPack:
+	var dict: Dictionary
+	var pack := ECSWorldPack.new(dict)
+	_pack_entities(dict)
+	return pack
+	
+func unpack_world(pack: ECSWorldPack) -> bool:
+	return _unpack_entities(pack.data())
+	
+func test_component() -> void:
+	for key: String in _w.get_component_keys():
+		for c: ECSComponent in _w.view(key):
+			c.test()
+			break
+	
+# ==============================================================================
+# private
+var _w: ECSWorld
+	
+func _init(w: ECSWorld) -> void:
+	_w = w
+	
+const CLASS = preload("../Serialization/header.gd")
+	
+func _pack_entities(dict: Dictionary) -> void:
+	var entity_data := {}
+	var class_list: Array[String]
+	for eid: int in _w.get_entity_keys():
+		var e := _w.get_entity(eid)
+		var entity_dict := {}
+		_pack_components(e, entity_dict, class_list)
+		entity_data[eid] = entity_dict
+	dict["entities"] = entity_data
+	dict["class_list"] = class_list
+	dict["last_entity_id"] = _w._entity_id
+	
+func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String]) -> void:
+	for c: ECSComponent in e.get_components():
+		var c_dict := {}
+		var output := CLASS.OutputArchive.new(c_dict)
+		c.save(output)
+		dict[c.name()] = c_dict
+		
+		var res: Resource = c.get_script()
+		var pos = class_list.find(res.resource_path)
+		if pos == -1:
+			class_list.append(res.resource_path)
+			pos = class_list.size() - 1
+		c_dict["_class_index"] = pos
+	
+func _unpack_entities(dict: Dictionary) -> bool:
+	if not dict.has("entities") or not dict.has("class_list"):
+		return false
+	
+	_w.remove_all_entities()
+	
+	var class_list: Array[String] = dict.class_list
+	for eid: int in dict.entities:
+		var entity_dict: Dictionary = dict.entities[eid]
+		var e = _w._create_entity(eid)
+		_unpack_components(e, entity_dict, class_list)
+	
+	_w._entity_id = dict["last_entity_id"]
+	
+	return true
+	
+func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String]) -> void:
+	for name: String in dict:
+		var c_dict: Dictionary = dict[name]
+		var index: int = c_dict["_class_index"]
+		if index < class_list.size():
+			var CompScript: Resource = load(class_list[index])
+			if CompScript == null:
+				printerr("unpack component fail: script <%s> is not exist!" % class_list[index])
+				continue
+			var c: ECSComponent = CompScript.new()
+			e.add_component(name, c)
+			var input := CLASS.InputArchive.new(c_dict)
+			_load_component_archive(c, input)
+			continue
+		
+		printerr("unpack component fail: class index <%d> is invalid!" % index)
+	
+func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
+	# get newest version
+	var ar := CLASS.InOutArchive.new({})
+	c.save(ar)
+	var newest_version: int = ar.version
+	
+	# data upgrade
+	ar.copy_from(from)
+	while ar.version < newest_version:
+		var old_version: int = ar.version
+		c.convert(ar)
+		if old_version == ar.version:
+			ar.version += 1
+		
+	# load the newest data
+	c.load(ar)
+	

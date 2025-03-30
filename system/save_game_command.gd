@@ -2,12 +2,12 @@ extends ECSCommand
 
 func _init():
 	print("save_game_command created.")
-
+	
 # override
 func _on_execute(e: ECSEvent):
 	print("save_game_command execute.")
 	_on_save_game(e)
-
+	
 func _on_save_game(event: ECSEvent):
 	# wrold
 	var world: ECSWorld = self.world()
@@ -36,10 +36,11 @@ func _on_save_game(event: ECSEvent):
 	
 	# notify game data
 	view("game_data").front().entity().add_component("game:data:saved")
-
+	
 func _write_to_disk(dict: Dictionary):
 	var f := FileAccess.open("user://game.save", FileAccess.WRITE)
 	if f:
 		var data = JSON.stringify(dict)
 		f.store_string(data)
 		f.close()
+	

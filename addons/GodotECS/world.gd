@@ -36,8 +36,6 @@ func create_entity(id: int = 0) -> ECSEntity:
 	if id == 0:
 		_entity_id += 1
 	remove_entity(eid)
-	if debug_print:
-		print("entity <%s:%d> created." % [_name, eid])
 	return _create_entity(eid)
 	
 func remove_entity(entity_id: int) -> bool:
@@ -331,5 +329,7 @@ func _create_entity(eid: int) -> ECSEntity:
 	var e := ECSEntity.new(eid, self) if not debug_entity else DebugEntity.new(eid, self)
 	_entity_pool[eid] = e
 	_entity_component_dict[eid] = {}
+	if debug_print:
+		print("entity <%s:%d> created." % [_name, eid])
 	return e
 	

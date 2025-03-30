@@ -2,12 +2,12 @@ extends ECSCommand
 
 func _init():
 	print("load_game_command created.")
-
+	
 # override
 func _on_execute(e: ECSEvent):
 	print("load_game_command execute.")
 	_on_load_game(e)
-
+	
 func _on_load_game(e: ECSEvent):
 	
 	# load file
@@ -30,10 +30,11 @@ func _on_load_game(e: ECSEvent):
 		
 		# notify game data
 		view("game_data").front().entity().add_component("game:data:loaded")
-
+	
 func _load_json(path: String):
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f:
 		var json_text = f.get_as_text()
 		return JSON.parse_string(json_text)
 	return null
+	
