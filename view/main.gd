@@ -31,20 +31,8 @@ func _connect_components():
 		c.on_score_changed.connect(_on_score_changed)
 		c.on_seconds_changed.connect(_on_seconds_changed)
 	
-func _on_game_data_event(e: ECSEntity, c: ECSComponent):
-	match c.name():
-		"game:data:loaded":
-			# tips
-			_tips.text = "Game data loaded."
-		"game:data:saved":
-			# tips
-			_tips.text = "Game data saved."
-		_:
-			return
-	await get_tree().create_timer(1).timeout
-	_tips.text = ""
-	
 func _on_game_loaded(e: ECSEvent):
+	# Recovery signal connection
 	_connect_components()
 	
 	_tips.text = "Game data loaded."
