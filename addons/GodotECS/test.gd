@@ -115,24 +115,10 @@ func mixed_test() -> void:
 		return false))
 	
 func test_snapshot() -> void:
-	var component_list: Array = _world.view("c1")
-	var data := {}
-	for c: ECSComponent in component_list:
-		var e: ECSEntity = c.entity()
-		var comps: Array = e.get_components()
-		var entity_data := {}
-		printt("\nstart save entity [%d] ..." % e.id())
-		for cc: ECSComponent in comps:
-			var save_data := {}
-			cc.save(save_data)
-			var name: String = cc.name()
-			entity_data[ name ] = save_data
-			printt("save component:", save_data)
-		data[ e.id() ] = entity_data
-		printt("entity [%d] save completed." % e.id())
-	# save entity data
-	print("\nentity snapshot:")
-	print(data)
+	var packer := ECSWorldPacker.new(_world)
+	var pack := packer.pack_world()
+	print("\nworld snapshot:")
+	print(pack.data())
 	
 	print("")
 	

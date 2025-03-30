@@ -14,20 +14,22 @@ func _exit_tree() -> void:
 	_world.remove_system("game_system")
 	
 func _ready():
+	_connect_components()
+	
 	# listen ecs world system viewed signal
 	_world.on_system_viewed.connect(_print_system_viewed)
 	
-	# listen game data signal
-	for c: ECSComponent in _world.view("game_data"):
-		c.entity().on_component_added.connect(_on_game_data_event)
-	
-	# connect component
-	for c: MyComponent in _world.view("my_component"):
-		c.on_score_changed.connect(_on_score_changed)
-		c.on_seconds_changed.connect(_on_seconds_changed)
+	# listen game save/load event
+	_world.add_callable("game_saved", _on_game_saved)
+	_world.add_callable("game_loaded", _on_game_loaded)
 	
 	# load game data
 	_world.notify("load_game_command")
+	
+func _connect_components():
+	for c: MyComponent in _world.view("my_component"):
+		c.on_score_changed.connect(_on_score_changed)
+		c.on_seconds_changed.connect(_on_seconds_changed)
 	
 func _on_game_data_event(e: ECSEntity, c: ECSComponent):
 	match c.name():
@@ -39,6 +41,18 @@ func _on_game_data_event(e: ECSEntity, c: ECSComponent):
 			_tips.text = "Game data saved."
 		_:
 			return
+	await get_tree().create_timer(1).timeout
+	_tips.text = ""
+	
+func _on_game_loaded(e: ECSEvent):
+	_connect_components()
+	
+	_tips.text = "Game data loaded."
+	await get_tree().create_timer(1).timeout
+	_tips.text = ""
+	
+func _on_game_saved(e: ECSEvent):
+	_tips.text = "Game data saved."
 	await get_tree().create_timer(1).timeout
 	_tips.text = ""
 	

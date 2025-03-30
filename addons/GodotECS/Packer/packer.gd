@@ -1,14 +1,22 @@
 extends RefCounted
 class_name ECSWorldPacker
 
+# ==============================================================================
+# public
+signal on_packed(sender: ECSWorldPacker)
+signal on_unpacked(sender: ECSWorldPacker)
+
 func pack_world() -> ECSWorldPack:
 	var dict: Dictionary
 	var pack := ECSWorldPack.new(dict)
 	_pack_entities(dict)
+	_on_packed.call_deferred()
 	return pack
 	
 func unpack_world(pack: ECSWorldPack) -> bool:
-	return _unpack_entities(pack.data())
+	var ret := _unpack_entities(pack.data())
+	_on_unpacked.call_deferred()
+	return ret
 	
 func test_component() -> void:
 	for key: String in _w.get_component_keys():
@@ -22,6 +30,12 @@ var _w: ECSWorld
 	
 func _init(w: ECSWorld) -> void:
 	_w = w
+	
+func _on_packed():
+	on_packed.emit(self)
+	
+func _on_unpacked():
+	on_unpacked.emit(self)
 	
 const CLASS = preload("../Serialization/header.gd")
 	
@@ -52,8 +66,10 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String])
 		c_dict["_class_index"] = pos
 	
 func _unpack_entities(dict: Dictionary) -> bool:
-	if not dict.has("entities") or not dict.has("class_list"):
-		return false
+	var required_keys := ["entities", "class_list", "last_entity_id"]
+	for key: String in required_keys:
+		if not dict.has(key):
+			return false
 	
 	_w.remove_all_entities()
 	

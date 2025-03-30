@@ -9,7 +9,7 @@ func add_callable(name: String, c: Callable) -> bool:
 func remove_callable(name: String, c: Callable) -> bool:
 	return _get_event_listener(name).remove(c)
 	
-func notify(name: String, value) -> void:
+func notify(name: String, value = null) -> void:
 	send( ECSEvent.new(name, value) )
 	
 func send(e: ECSEvent) -> void:
