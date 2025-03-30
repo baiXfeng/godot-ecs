@@ -6,12 +6,15 @@ Lightweight ecs framework written with gdscript.
 # Features
 
 - Lightweight and high-performance.
-- Components support serialization and deserialization.
+- One step serialization and deserialization the game world.
+- Independent event system.
+- Hot-swappable system design.
+- Data-driven and event-driven.
 - Easy to use.
 
 # How To Use
 
-- Copy the 'ecs' directory to any location within your Godot project.
+- Download “GodotECS” to “addons” folder in your Godot project.
 - Begin your ECS coding journey with the following code:
 
 ```gdscript
@@ -47,29 +50,12 @@ for c: ECSComponent in world.view("c1"):
 for dict: Dictionary in world.multi_view(["c1", "c2", "c3"]):
 	print(dict)
 
-# view components with filter
-for c: ECSComponent in world.view("c1", func(c: ECSComponent) -> bool:
-	return true):
-	print(c)
+# save game
+var packer := ECSWorldPacker.new(world)
+var pack := packer.pack_world()
+# pack.data() write to file
 
-# multi view components with filter
-for dict: Dictionary in world.multi_view(["c1", "c2"], func(dict: Dictionary) -> bool:
-	return true):
-	print(dict)
-	
-# serialize components
-var serialize_dict := {}
-for c: ECSComponent in component_list:
-	var entity: ECSEntity = c.entity()
-	var all_components: Array = entity.get_components()
-	var entity_data := {}
-	for cc: ECSComponent in all_components:
-		var data := {}
-		cc.save( data )
-		entity_data[ cc.name() ] = data
-	var entity_id: int = entity.id()
-	serialize_dict[ entity_id ] = entity_data
-
-printt("this is entity serialize data", serialize_dict)
+# load game
+packer.unpack_world(pack)
 
 ```
