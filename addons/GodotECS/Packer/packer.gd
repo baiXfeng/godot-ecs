@@ -7,7 +7,9 @@ signal on_packed(sender: ECSWorldPacker)
 signal on_unpacked(sender: ECSWorldPacker)
 
 func pack_world() -> ECSWorldPack:
-	var dict: Dictionary
+	var dict := {
+		"version": _w.VERSION,
+	}
 	var pack := ECSWorldPack.new(dict)
 	_pack_entities(dict)
 	_on_packed.call_deferred()
@@ -66,6 +68,11 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String])
 		c_dict["_class_index"] = pos
 	
 func _unpack_entities(dict: Dictionary) -> bool:
+	# verify version
+	if not dict.has("version") or not _valid_version(dict["version"]):
+		return false
+	
+	# verify keys
 	var required_keys := ["entities", "class_list", "last_entity_id"]
 	for key: String in required_keys:
 		if not dict.has(key):
@@ -81,6 +88,9 @@ func _unpack_entities(dict: Dictionary) -> bool:
 	
 	_w._entity_id = dict["last_entity_id"]
 	
+	return true
+	
+func _valid_version(version: String) -> bool:
 	return true
 	
 func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String]) -> void:

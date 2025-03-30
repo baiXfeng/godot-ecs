@@ -1,6 +1,8 @@
 extends RefCounted
 class_name ECSWorld
 
+const VERSION = "2.1.0"
+
 var debug_print: bool		# ecs logging
 var debug_entity: bool		# for entity debugging
 var ignore_notify_log: Dictionary # ignore notify log
