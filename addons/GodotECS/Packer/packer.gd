@@ -129,6 +129,7 @@ func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String
 			var CompScript: Resource = load(class_list[index])
 			if CompScript == null:
 				printerr("unpack component fail: script <%s> is not exist!" % class_list[index])
+				assert(false)
 				continue
 			var c: ECSComponent = CompScript.new()
 			e.add_component(name, c)
@@ -137,6 +138,7 @@ func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String
 			continue
 		
 		printerr("unpack component fail: class index <%d> is invalid!" % index)
+		assert(false)
 	
 func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 	# get newest version
