@@ -55,7 +55,7 @@ func _load_uid_cache():
 		var path := f.get_buffer(length).get_string_from_utf8()
 		_uid_cache[path] = ResourceUID.id_to_text(key)
 	
-const CLASS = preload("../Serialization/header.gd")
+const CLASS = preload("../Serialization/serialize.gd")
 	
 func _pack_entities(dict: Dictionary) -> void:
 	var entity_data := {}
@@ -77,7 +77,7 @@ func _pack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String],
 	for c: ECSComponent in e.get_components():
 		var c_dict := {}
 		var output := CLASS.OutputArchive.new(c_dict)
-		c.save(output)
+		c.pack(output)
 		dict[c.name()] = c_dict
 		
 		var res: Resource = c.get_script()
@@ -143,7 +143,7 @@ func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String
 func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 	# get newest version
 	var ar := CLASS.InOutArchive.new({})
-	c.save(ar)
+	c.pack(ar)
 	var newest_version: int = ar.version
 	
 	# data upgrade
@@ -153,5 +153,5 @@ func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 		ar.version += 1
 		
 	# load the newest data
-	c.load(ar)
+	c.unpack(ar)
 	
