@@ -11,20 +11,16 @@ func _on_execute(e: ECSEvent):
 func _on_load_game(e: ECSEvent):
 	
 	# load file
-	var game_data = _load_json("user://game.save")
-	if game_data != null:
-		
-		# restore the world
-		var packer := ECSWorldPacker.new(world())
-		var pack := ECSWorldPack.new(game_data)
-		packer.unpack_world(pack)
-		
-		# notify game data
-		world().notify("game_loaded")
+	var bytes := ECSBytes.open("user://game.save")
+	if bytes == null:
+		return
 	
-func _load_json(path: String) -> Dictionary:
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f:
-		return f.get_var()
-	return {}
+	# restore the world
+	var packer := ECSWorldPacker.new(world())
+	var data = bytes.decode_var()
+	var pack := ECSWorldPack.new(data if data else {})
+	packer.unpack_world(pack)
+	
+	# notify game data
+	world().notify("game_loaded")
 	

@@ -15,14 +15,10 @@ func _on_save_game(e: ECSEvent):
 	var pack := packer.pack_world()
 	
 	# save to file
-	_write_to_disk(pack.data())
+	var bytes := ECSBytes.new()
+	bytes.encode_var(pack.data())
+	bytes.write("user://game.save")
 	
 	# notify game data
 	world().notify("game_saved")
-	
-func _write_to_disk(dict: Dictionary):
-	var f := FileAccess.open("user://game.save", FileAccess.WRITE)
-	if f:
-		f.store_var(dict)
-		f.close()
 	

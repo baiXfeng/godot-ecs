@@ -3,8 +3,8 @@ class_name ECSWorldPacker
 
 # ==============================================================================
 # public
-signal on_packed(sender: ECSWorldPacker)
-signal on_unpacked(sender: ECSWorldPacker)
+signal on_packed(sender: ECSWorldPacker, pack: ECSWorldPack)
+signal on_unpacked(sender: ECSWorldPacker, pack: ECSWorldPack)
 
 func pack_world() -> ECSWorldPack:
 	var dict := {
@@ -12,13 +12,17 @@ func pack_world() -> ECSWorldPack:
 	}
 	var pack := ECSWorldPack.new(dict)
 	_load_uid_cache()
+	_pack_world(dict)
 	_pack_entities(dict)
-	_on_packed.call_deferred()
+	_on_packed.call_deferred(pack)
 	return pack
 	
 func unpack_world(pack: ECSWorldPack) -> bool:
-	var ret := _unpack_entities(pack.data())
-	_on_unpacked.call_deferred()
+	var dict := pack.data()
+	var ret := _unpack_entities(dict)
+	if ret:
+		_unpack_world(dict)
+	_on_unpacked.call_deferred(pack)
 	return ret
 	
 func test_component() -> void:
@@ -35,13 +39,13 @@ var _uid_cache: Dictionary
 func _init(w: ECSWorld) -> void:
 	_w = w
 	
-func _on_packed():
-	on_packed.emit(self)
+func _on_packed(pack: ECSWorldPack) -> void:
+	on_packed.emit(self, pack)
 	
-func _on_unpacked():
-	on_unpacked.emit(self)
+func _on_unpacked(pack: ECSWorldPack) -> void:
+	on_unpacked.emit(self, pack)
 	
-func _load_uid_cache():
+func _load_uid_cache() -> void:
 	_uid_cache.clear()
 	
 	var f := FileAccess.open("res://.godot/uid_cache.bin", FileAccess.READ)
@@ -154,4 +158,13 @@ func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 		
 	# load the newest data
 	c.unpack(ar)
+	
+# ==============================================================================
+# override
+func _pack_world(dict: Dictionary) -> void:
+	pass
+	
+# override
+func _unpack_world(dict: Dictionary) -> void:
+	pass
 	

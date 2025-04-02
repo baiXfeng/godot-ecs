@@ -38,7 +38,7 @@ func is_peer_connected() -> bool:
 func peer() -> MultiplayerPeer:
 	return multiplayer.multiplayer_peer
 	
-func set_peer(peer: MultiplayerPeer):
+func set_peer(peer: MultiplayerPeer) -> void:
 	multiplayer.multiplayer_peer = peer
 	
 func on_enter(w: ECSWorld) -> void:
