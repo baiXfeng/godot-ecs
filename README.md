@@ -59,3 +59,9 @@ var pack := packer.pack_world()
 packer.unpack_world(pack)
 
 ```
+
+# Funding
+
+If you've found GodotECS useful, feel free to fund me on ko-fi:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/baifeng)
