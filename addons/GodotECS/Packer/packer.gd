@@ -14,16 +14,16 @@ func pack_world() -> ECSWorldPack:
 	_load_uid_cache()
 	_pack_world(dict)
 	_pack_entities(dict)
-	_on_packed.call_deferred(pack)
+	_on_packed(pack)
 	return pack
 	
 func unpack_world(pack: ECSWorldPack) -> bool:
 	var dict := pack.data()
-	var ret := _unpack_entities(dict)
-	if ret:
+	if _unpack_entities(dict):
 		_unpack_world(dict)
-	_on_unpacked.call_deferred(pack)
-	return ret
+		_on_unpacked(pack)
+		return true
+	return false
 	
 func test_component() -> void:
 	for key: String in _w.get_component_keys():
