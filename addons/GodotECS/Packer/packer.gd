@@ -111,12 +111,23 @@ func _unpack_entities(dict: Dictionary) -> bool:
 	_w.remove_all_entities()
 	
 	var class_list: Array[String] = dict.class_list
+	
+	# restore entities
 	for eid: int in dict.entities:
 		var entity_dict: Dictionary = dict.entities[eid]
 		var e = _w._create_entity(eid)
-		_unpack_components(e, entity_dict["components"], class_list)
 		for name: String in entity_dict["groups"]:
 			e.add_to_group(name)
+	
+	# restore components
+	for eid: int in dict.entities:
+		var entity_dict: Dictionary = dict.entities[eid]
+		_unpack_components(_w.get_entity(eid), entity_dict["components"], class_list)
+	
+	# restore components data
+	for eid: int in dict.entities:
+		var entity_dict: Dictionary = dict.entities[eid]
+		_unpack_archives(_w.get_entity(eid), entity_dict["components"])
 	
 	_w._entity_id = dict["last_entity_id"]
 	
@@ -126,23 +137,29 @@ func _valid_version(version: String) -> bool:
 	return true
 	
 func _unpack_components(e: ECSEntity, dict: Dictionary, class_list: Array[String]) -> void:
+	# restore components
 	for name: String in dict:
+		
+		# get class index
 		var c_dict: Dictionary = dict[name]
 		var index: int = c_dict["_class_index"]
-		if index < class_list.size():
-			var CompScript: Resource = load(class_list[index])
-			if CompScript == null:
-				printerr("unpack component fail: script <%s> is not exist!" % class_list[index])
-				assert(false)
-				continue
-			var c: ECSComponent = CompScript.new()
-			e.add_component(name, c)
-			var input := CLASS.InputArchive.new(c_dict)
-			_load_component_archive(c, input)
-			continue
+		assert(index < class_list.size(), "unpack component fail: class index <%d> is invalid!" % index)
 		
-		printerr("unpack component fail: class index <%d> is invalid!" % index)
-		assert(false)
+		# get class resource
+		var CompScript: Resource = load(class_list[index])
+		assert(CompScript != null, "unpack component fail: script <%s> is not exist!" % class_list[index])
+		
+		# create component
+		var c: ECSComponent = CompScript.new()
+		e.add_component(name, c)
+	
+func _unpack_archives(e: ECSEntity, dict: Dictionary) -> void:
+	# load components archive
+	for name: String in dict:
+		var c_dict: Dictionary = dict[name]
+		var c: ECSComponent = e.get_component(name)
+		var input := CLASS.InputArchive.new(c_dict)
+		_load_component_archive(c, input)
 	
 func _load_component_archive(c: ECSComponent, from: CLASS.Archive) -> void:
 	# get newest version
