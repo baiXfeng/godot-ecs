@@ -133,12 +133,25 @@ func view(name: String, filter := Callable()) -> Array:
 			ret.append(c)
 	return ret
 	
+func view_group(group_name: String, component_names: Array[String], filter := Callable()) -> Array:
+	var result := []
+	for entities: Array[ECSEntity] in group(group_name):
+		for e: ECSEntity in entities:
+			if _is_satisfy_components(e, component_names):
+				var dict := _get_satisfy_components(e, component_names)
+				if filter.is_valid():
+					if filter.call(dict):
+						result.append(dict)
+				else:
+					result.append(dict)
+	return result
+	
 func multi_view(names: Array, filter := Callable()) -> Array:
-	var result: Array = []
+	var result := []
 	for c: ECSComponent in view(names.front()):
 		var e: ECSEntity = c.entity()
 		if _is_satisfy_components(e, names):
-			var dict: Dictionary = _get_satisfy_components(e, names)
+			var dict := _get_satisfy_components(e, names)
 			if filter.is_valid():
 				if filter.call(dict):
 					result.append(dict)

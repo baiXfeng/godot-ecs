@@ -15,6 +15,11 @@ func view(name: String, filter := Callable()) -> Array:
 	w.on_system_viewed.emit(self.name(), [name])
 	return w.view(name, filter)
 	
+func view_group(group_name: String, component_names: Array[String], filter := Callable()) -> Array:
+	var w := world()
+	w.on_system_viewed.emit(self.name(), component_names)
+	return w.view_group(group_name, component_names, filter)
+	
 func multi_view(names: Array, filter := Callable()) -> Array:
 	var w := world()
 	w.on_system_viewed.emit(self.name(), names)
