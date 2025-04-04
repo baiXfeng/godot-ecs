@@ -176,12 +176,30 @@ func test_command() -> void:
 	
 func test_entity_add_to_group() -> void:
 	var e: ECSEntity = _world.create_entity()
+	e.add_component("attack_unit")
+	e.add_component("game_unit")
 	e.add_to_group("battle")
 	e.add_to_group("attack")
+	
 	printt("entity group list:", e.get_groups())
 	e.remove_from_group("battle")
 	printt("entity group list:", e.get_groups())
-	var battle_entity_list: Array = _world.fetch_entities("battle")
+	var battle_entity_list: Array = _world.group("battle")
 	printt("battle entity size:", battle_entity_list.size())
 	
+	for i in 3:
+		var new_entity := _world.create_entity()
+		new_entity.add_component("game_unit")
+		new_entity.add_to_group("attack")
+	
+	assert(_world.group_view("attack", "game_unit").size() == 4 and \
+		_world.group_multi_view("attack", ["game_unit", "attack_unit"]).size() == 1
+	)
+	
+	for atk_entity: ECSEntity in _world.group("attack"):
+		atk_entity.destroy()
+	
+	assert(_world.group("attack").is_empty())
+	
+	print("")
 	

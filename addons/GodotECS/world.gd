@@ -133,20 +133,7 @@ func view(name: String, filter := Callable()) -> Array:
 			ret.append(c)
 	return ret
 	
-func view_group(group_name: String, component_names: Array[String], filter := Callable()) -> Array:
-	var result := []
-	for entities: Array[ECSEntity] in group(group_name):
-		for e: ECSEntity in entities:
-			if _is_satisfy_components(e, component_names):
-				var dict := _get_satisfy_components(e, component_names)
-				if filter.is_valid():
-					if filter.call(dict):
-						result.append(dict)
-				else:
-					result.append(dict)
-	return result
-	
-func multi_view(names: Array, filter := Callable()) -> Array:
+func multi_view(names: Array[String], filter := Callable()) -> Array:
 	var result := []
 	for c: ECSComponent in view(names.front()):
 		var e: ECSEntity = c.entity()
@@ -199,13 +186,35 @@ func _get_entity_groups(entity_id: int) -> Dictionary:
 		_entity_groups[entity_id] = {}
 	return _entity_groups[entity_id]
 	
-func fetch_entities(group_name: String) -> Array:
+func group(group_name: String) -> Array:
 	if _group_entity_dict.has(group_name):
 		return _group_entity_dict[group_name].keys()
 	return []
 	
-func group(group_name: String) -> Array:
-	return fetch_entities(group_name)
+func group_view(group_name: String, name: String, filter := Callable()) -> Array:
+	var result := []
+	for e: ECSEntity in group(group_name):
+		var c: ECSComponent = e.get_component(name)
+		if c == null:
+			continue
+		if filter.is_valid():
+			if filter.call(c):
+				result.append(c)
+		else:
+			result.append(c)
+	return result
+	
+func group_multi_view(group_name: String, component_names: Array[String], filter := Callable()) -> Array:
+	var result := []
+	for e: ECSEntity in group(group_name):
+		if _is_satisfy_components(e, component_names):
+			var dict := _get_satisfy_components(e, component_names)
+			if filter.is_valid():
+				if filter.call(dict):
+					result.append(dict)
+			else:
+				result.append(dict)
+	return result
 	
 func add_system(name: String, system: ECSSystem) -> bool:
 	remove_system(name)
