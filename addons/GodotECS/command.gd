@@ -29,8 +29,21 @@ func multi_view(names: Array, filter := Callable()) -> Array:
 	w.on_system_viewed.emit(_name, names)
 	return w.multi_view(names, filter)
 	
-func group(name: String) -> Array:
-	return world().group(name)
+func group_view(group_name: String, name: String, filter := Callable()) -> Array:
+	var w := world()
+	w.on_system_viewed.emit(_name, [name])
+	return w.group_view(group_name, name, filter)
+	
+func group_multi_view(group_name: String, names: Array[String], filter := Callable()) -> Array:
+	var w := world()
+	w.on_system_viewed.emit(_name, names)
+	return w.group_multi_view(group_name, names, filter)
+	
+func notify(event_name: String, value = null) -> void:
+	world().notify(event_name, value)
+	
+func send(e: ECSEvent) -> void:
+	world().send(e)
 	
 # ==============================================================================
 # override
