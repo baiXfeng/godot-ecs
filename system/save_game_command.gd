@@ -6,9 +6,6 @@ func _init():
 # override
 func _on_execute(e: ECSEvent):
 	print("save_game_command execute.")
-	_on_save_game(e)
-	
-func _on_save_game(e: ECSEvent):
 	
 	# pack the world
 	var packer := ECSWorldPacker.new(world())
@@ -17,8 +14,10 @@ func _on_save_game(e: ECSEvent):
 	# save to file
 	var bytes := ECSBytes.new()
 	bytes.encode_var(pack.data())
-	bytes.write("user://game.save")
+	var successed := bytes.write("user://game.save")
 	
 	# notify game data
-	world().notify("game_saved")
+	world().notify("game_saved", {
+		"successed": successed,
+	})
 	

@@ -32,6 +32,11 @@ func _connect_components():
 		c.on_seconds_changed.connect(_on_seconds_changed)
 	
 func _on_game_loaded(e: ECSEvent):
+	var successed: bool = e.data.successed
+	if not successed:
+		_tips.text = "Game data load failed."
+		return
+	
 	# Recovery signal connection
 	_connect_components()
 	
@@ -40,6 +45,11 @@ func _on_game_loaded(e: ECSEvent):
 	_tips.text = ""
 	
 func _on_game_saved(e: ECSEvent):
+	var successed: bool = e.data.successed
+	if not successed:
+		_tips.text = "Game data save failed."
+		return
+		
 	_tips.text = "Game data saved."
 	await get_tree().create_timer(1).timeout
 	_tips.text = ""
