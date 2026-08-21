@@ -26,6 +26,8 @@ func run() -> void:
 	_run_test("Command Buffer Defer", _test_commands_defer)
 	_run_test("Scheduler & Parallel Systems", _test_scheduler_dependency)
 	_run_test("Serialization (Pack/Unpack)", _test_serialization)
+	_run_test("Serialization (Selective Merge)", _test_selective_serialization)
+	_run_test("Serialization (Merge Conflicts)", _test_serialization_merge_conflicts)
 	_run_test("ECSRunner System Management", _test_runner_system_management)
 	_run_test("ECSRunner Update Control", _test_runner_update_control)
 	_run_test("ECSRunner Lifecycle", _test_runner_lifecycle)
@@ -474,6 +476,64 @@ func _test_serialization() -> void:
 		if e_restored.has_component("Health"):
 			var h = e_restored.get_component("Health") as CompHealth
 			_assert(h.data == 50, "Component standard data restored correct")
+
+func _test_selective_serialization() -> void:
+	var selected = _world.create_entity()
+	selected.add_component("Pos", CompPos.new())
+	var selected_pos := selected.get_component("Pos") as CompPos
+	selected_pos.x = 100
+	selected.add_component("Health", CompHealth.new(50))
+	selected.add_component("Mana", CompMana.new(20))
+	var untouched = _world.create_entity()
+	untouched.add_component("Health", CompHealth.new(7))
+
+	var packer := ECSWorldPacker.new(_world)
+	var pack := packer.entities([selected.id()]).components(["Health", "Mana"]).pack()
+	var data := pack.data()
+	var packed_components: Dictionary = data.entities[selected.id()].components
+	_assert(data.entities.size() == 1, "Selective pack contains only selected entity")
+	_assert(packed_components.has("Health") and packed_components.has("Mana"), "Selective pack contains selected components")
+	_assert(not packed_components.has("Pos"), "Selective pack omits unselected component")
+
+	var selected_health := selected.get_component("Health") as CompHealth
+	selected_health.data = 1
+	selected.remove_component("Mana")
+	selected_pos.x = 999
+	packer.factory().register(CompMana, [0])
+	var success := packer.entities([selected.id()]).components(["Health", "Mana"]).unpack_merge(pack)
+	_assert(success, "Selective merge unpack succeeds")
+	_assert((selected.get_component("Health") as CompHealth).data == 50, "Selective merge overwrites selected component data")
+	_assert((selected.get_component("Mana") as CompMana).data == 20, "Selective merge creates missing selected component")
+	_assert((selected.get_component("Pos") as CompPos).x == 999, "Selective merge preserves unselected component")
+	_assert((untouched.get_component("Health") as CompHealth).data == 7, "Selective merge preserves unrelated entity")
+
+	var included_pack := ECSWorldPacker.new(_world) \
+		.include(selected.id(), ["Health"]) \
+		.include(untouched.id()) \
+		.pack()
+	var included_data := included_pack.data()
+	_assert(included_data.entities.size() == 2, "Per-entity selection includes each requested entity")
+	_assert(included_data.entities[selected.id()].components.size() == 1, "Per-entity selection limits component list")
+	_assert(included_data.entities[untouched.id()].components.has("Health"), "Empty per-entity component list selects all components")
+
+func _test_serialization_merge_conflicts() -> void:
+	var entity = _world.create_entity()
+	entity.add_component("Health", CompHealth.new(50))
+	var packer := ECSWorldPacker.new(_world)
+	var pack := packer.entities([entity.id()]).components(["Health"]).pack()
+	packer.factory().register(CompHealth, [0])
+
+	var health := entity.get_component("Health") as CompHealth
+	health.data = 1
+	var skipped := packer.on_component_conflict(ECSWorldPacker.SKIP).unpack_merge(pack)
+	_assert(skipped, "Skip conflict merge succeeds")
+	_assert((entity.get_component("Health") as CompHealth).data == 1, "Skip conflict preserves component data")
+
+	var previous = entity.get_component("Health")
+	var replaced := packer.on_component_conflict(ECSWorldPacker.REPLACE_COMPONENT).unpack_merge(pack)
+	_assert(replaced, "Replace conflict merge succeeds")
+	_assert(entity.get_component("Health") != previous, "Replace conflict creates a new component")
+	_assert((entity.get_component("Health") as CompHealth).data == 50, "Replace conflict restores packed data")
 
 func _test_runner_system_management() -> void:
 	var runner = _world.create_runner("TestRunner")

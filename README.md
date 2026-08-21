@@ -186,12 +186,31 @@ class SysPhysics extends ECSParallel:
 The framework has built-in powerful save support, even supporting data structure upgrades:
 
 ```gdscript
-# Save
+# Full snapshot save and restore
 var packer = ECSWorldPacker.new(_world).with_factory(factory)
-var data = packer.pack() # Get serializable DataPack
+var data = packer.pack() # Get serializable DataPack for the complete world
 
-# Load
-packer.unpack(data) # Automatically restore world state
+# Full restore clears the current world's entities first.
+packer.unpack(data)
+```
+
+Serialize only selected entities and components, then merge them without
+affecting unrelated world state:
+
+```gdscript
+# Save only the network state for these entities.
+var data = ECSWorldPacker.new(_world) \
+    .entities([player_id, enemy_id]) \
+    .components(["Transform", "Health"]) \
+    .pack()
+
+# Restore only the selected data. Existing matching components have their data
+# overwritten; unrelated entities and components remain unchanged.
+var success = ECSWorldPacker.new(_world) \
+    .with_factory(factory) \
+    .entities([player_id, enemy_id]) \
+    .components(["Transform", "Health"]) \
+    .unpack_merge(data)
 ```
 
 ## 🤝 Contribution
